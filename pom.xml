@@ -14,7 +14,7 @@
 	<packaging>jar</packaging>
 
 	<name>spring-boot-starter-pf4j2</name>
-	<url></url>
+	<url>https://github.com/vindell/spring-boot-starter-pf4j2</url>
 	<description></description>
 
 	<licenses>
@@ -31,9 +31,9 @@
 		<java.version>1.8</java.version>
 		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
 		<slf4j.version>1.7.25</slf4j.version>
-		<pf4j.version>2.0.0</pf4j.version>
-		<pf4j-update.version>0.5.0-SNAPSHOT</pf4j-update.version>
-		<pf4j-spring.version>0.4.0-SNAPSHOT</pf4j-spring.version>
+		<pf4j.version>2.2.0</pf4j.version>
+		<pf4j-update.version>2.0.0</pf4j-update.version>
+		<pf4j-spring.version>0.4.0</pf4j-spring.version>
 	</properties>
 
 	<repositories>
@@ -58,11 +58,10 @@
 			<optional>true</optional>
 		</dependency>
 		
-		<!-- https://mvnrepository.com/artifact/commons-lang/commons-lang -->
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 		<dependency>
-		    <groupId>commons-lang</groupId>
-		    <artifactId>commons-lang</artifactId>
-		    <version>2.6</version>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-lang3</artifactId>
 		</dependency>
 
 		<!-- Core starter, including auto-configuration support, logging and YAML -->
@@ -113,12 +112,13 @@
 		    <scope>test</scope>
 		</dependency>
 		
-		<!-- 自己编译源码 : https://github.com/decebals/pf4j -->
+		<!-- https://mvnrepository.com/artifact/org.pf4j/pf4j -->
 		<dependency>
 		    <groupId>org.pf4j</groupId>
 		    <artifactId>pf4j</artifactId>
 		    <version>${pf4j.version}</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.pf4j/pf4j-spring -->
 		<dependency>
 		    <groupId>org.pf4j</groupId>
 		    <artifactId>pf4j-spring</artifactId>
@@ -134,8 +134,9 @@
 		    	</exclusion>
 		    </exclusions>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.pf4j/pf4j-update -->
 		<dependency>
-		    <groupId>ro.fortsoft.pf4j</groupId>
+		    <groupId>org.pf4j</groupId>
 		    <artifactId>pf4j-update</artifactId>
 		    <version>${pf4j-update.version}</version>
 		</dependency>
