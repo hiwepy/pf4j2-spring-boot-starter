@@ -1,4 +1,4 @@
-# spring-boot-starter-pf4j
+# spring-boot-starter-pf4j2
 pf4j starter for spring boot
 
 ### 说明
@@ -13,12 +13,12 @@ pf4j starter for spring boot
 ``` xml
 <dependency>
 	<groupId>${project.groupId}</groupId>
-	<artifactId>spring-boot-starter-pf4j</artifactId>
+	<artifactId>spring-boot-starter-pf4j2</artifactId>
 	<version>${project.version}</version>
 </dependency>
 ```
 
 ### Sample
 
-[https://github.com/vindell/spring-boot-starter-samples/tree/master/spring-boot-sample-pf4j](https://github.com/vindell/spring-boot-starter-samples/tree/master/spring-boot-sample-pf4j "spring-boot-sample-pf4j")
+[https://github.com/vindell/spring-boot-starter-samples/tree/master/spring-boot-sample-pf4j2](https://github.com/vindell/spring-boot-starter-samples/tree/master/spring-boot-sample-pf4j2 "spring-boot-sample-pf4j2")
 
