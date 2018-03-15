@@ -44,11 +44,11 @@ import org.springframework.util.StringUtils;
 
 /**
  * 
- * @className	： Pf4jAutoConfiguration
- * @description	： TODO(描述这个类的作用)
- * @author 		： <a href="https://github.com/vindell">vindell</a>
- * @date		： 2017年10月31日 下午6:25:53
- * @version 	V1.0
+ * @className ： Pf4jAutoConfiguration
+ * @description ： TODO(描述这个类的作用)
+ * @author ： <a href="https://github.com/vindell">vindell</a>
+ * @date ： 2017年10月31日 下午6:25:53
+ * @version V1.0
  */
 @Configuration
 @ConditionalOnClass({ PluginManager.class })
@@ -58,9 +58,9 @@ public class Pf4jAutoConfiguration implements DisposableBean {
 
 	private PluginManager pluginManager;
 	private Logger logger = LoggerFactory.getLogger(Pf4jAutoConfiguration.class);
-	//实例化Timer类 
-	private Timer timer = new Timer(true);  
-	
+	// 实例化Timer类
+	private Timer timer = new Timer(true);
+
 	@Bean
 	@ConditionalOnMissingBean(PluginStateListener.class)
 	public PluginStateListener pluginStateListener() {
@@ -86,49 +86,47 @@ public class Pf4jAutoConfiguration implements DisposableBean {
 	@Bean
 	public PluginManager pluginManager(Pf4jProperties properties) {
 
-		//设置运行模式
+		// 设置运行模式
 		RuntimeMode mode = RuntimeMode.byName(properties.getMode());
 		System.setProperty("pf4j.mode", mode.toString());
-		
-		//设置插件目录
+
+		// 设置插件目录
 		String pluginsDir = StringUtils.hasText(properties.getPluginsDir()) ? properties.getPluginsDir() : "plugins";
 		System.setProperty("pf4j.pluginsDir", pluginsDir);
 		String apphome = System.getProperty("app.home");
-		if(RuntimeMode.DEPLOYMENT.compareTo(RuntimeMode.byName(properties.getMode())) == 0 && StringUtils.hasText(apphome)) {
+		if (RuntimeMode.DEPLOYMENT.compareTo(RuntimeMode.byName(properties.getMode())) == 0
+				&& StringUtils.hasText(apphome)) {
 			System.setProperty("pf4j.pluginsDir", apphome + File.separator + pluginsDir);
 		}
-		
+
 		// final PluginManager pluginManager = new DefaultPluginManager();
 		// final PluginManager pluginManager = new JarPluginManager();
-		
+
 		PluginManager pluginManager = null;
-		if(properties.isJarPackages()) {
-			
+		if (properties.isJarPackages()) {
+
 			PluginClasspath pluginClasspath = new Pf4jPluginClasspath(properties.getClassesDirectories(),
 					properties.getLibDirectories());
-			
-			if(properties.isSpring()) {
-				
+
+			if (properties.isSpring()) {
+
 				/**
 				 * 使用Spring时需编写如下的初始化逻辑
-				 * @Configuration
-					public class Pf4jConfig {
-						@Bean
-						public ExtensionsInjector extensionsInjector() {
-							return new ExtensionsInjector();
-						}
-					}
+				 * 
+				 * @Configuration public class Pf4jConfig {
+				 * @Bean public ExtensionsInjector extensionsInjector() { return new
+				 *       ExtensionsInjector(); } }
 				 * 
 				 */
-				
+
 				pluginManager = new Pf4jJarPluginWhitSpringManager(pluginClasspath);
-			}else {
+			} else {
 				pluginManager = new Pf4jJarPluginManager(pluginClasspath);
 			}
 		} else {
 			pluginManager = new Pf4jPluginManager(pluginsDir);
 		}
-		
+
 		/*
 		 * pluginManager.enablePlugin(pluginId) pluginManager.disablePlugin(pluginId)
 		 * pluginManager.deletePlugin(pluginId)
@@ -136,21 +134,24 @@ public class Pf4jAutoConfiguration implements DisposableBean {
 		 * pluginManager.loadPlugin(pluginPath) pluginManager.startPlugin(pluginId)
 		 * pluginManager.stopPlugin(pluginId) pluginManager.unloadPlugin(pluginId)
 		 */
-		
-		if(properties.isLazy()) {
+
+		if (properties.isLazy()) {
 			// 延时加载、启动插件目录中的插件
-			timer.schedule(new PluginLazyTask(pluginManager) , properties.getDelay()); 
+			timer.schedule(new PluginLazyTask(pluginManager), properties.getDelay());
 			// 延时加载、启动绝对路径指定的插件
-			timer.schedule(new PluginsLazyTask(pluginManager, properties.getPlugins()) , properties.getDelay()); 
+			timer.schedule(new PluginsLazyTask(pluginManager, properties.getPlugins()), properties.getDelay());
 		} else {
-			
+
 			// 加载、启动插件目录中的插件
 			pluginManager.loadPlugins();
+			/*
+			 * 调用Plugin实现类的start()方法:
+			 */
 			pluginManager.startPlugins();
 			// 加载、启动绝对路径指定的插件
 			PluginUtils.loadAndStartPlugins(pluginManager, properties.getPlugins());
-		} 
-		
+		}
+
 		this.pluginManager = pluginManager;
 		return pluginManager;
 	}
@@ -159,6 +160,9 @@ public class Pf4jAutoConfiguration implements DisposableBean {
 	public void destroy() throws Exception {
 		// 销毁插件
 		if (pluginManager != null) {
+			/*
+			 * 调用Plugin实现类的stop()方法
+			 */
 			pluginManager.stopPlugins();
 		}
 

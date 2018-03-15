@@ -9,10 +9,12 @@
 		<version>2.0.0.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-
+	
+	<groupId>com.github.vindell</groupId>
 	<artifactId>spring-boot-starter-pf4j2</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
-
+	
 	<name>spring-boot-starter-pf4j2</name>
 	<url>https://github.com/vindell/spring-boot-starter-pf4j2</url>
 	<description></description>
@@ -100,7 +102,7 @@
 			<optional>true</optional>
 		</dependency>
 		
-		<!-- SLF4J，即简单日志门面（Simple Logging Facade for Java），不是具体的日志解决方案，它只服务于各种各样 
+		<!-- SLF4J，即简单日志门面（Sample Logging Facade for Java），不是具体的日志解决方案，它只服务于各种各样 
 			的日志系统。按照官方的说法，SLF4J是一个用于日志系统的简单Facade，允许最终用户在部署其应用时使用其所希望的日志系统。 -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -302,6 +304,5 @@
 			</plugin>
 		</plugins>
 	</build>
-
 
 </project>
