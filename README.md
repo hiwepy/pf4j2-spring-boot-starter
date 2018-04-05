@@ -4,7 +4,7 @@ pf4j starter for spring boot
 ### 说明
 
 
- > 基于 Pf4j 的 Spring Boot Starter 实现
+ > 基于 Pf4j 2.x 的 Spring Boot Starter 实现
 
 1. 整合Pf4j插件能力
 

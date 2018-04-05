@@ -43,12 +43,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
 /**
- * 
- * @className ： Pf4jAutoConfiguration
- * @description ： TODO(描述这个类的作用)
- * @author ： <a href="https://github.com/vindell">vindell</a>
- * @date ： 2017年10月31日 下午6:25:53
- * @version V1.0
+ * Pf4j 2.x Configuration
+ * @author <a href="https://github.com/vindell">vindell</a>
  */
 @Configuration
 @ConditionalOnClass({ PluginManager.class })
