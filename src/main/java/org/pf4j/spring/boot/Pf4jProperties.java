@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.pf4j.RuntimeMode;
+import org.pf4j.update.UpdateRepository;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -35,24 +36,29 @@ public class Pf4jProperties {
 	public static final String PREFIX = "pf4j";
 
 	/** 是否启用 **/
-	protected boolean enabled = false;
+	private boolean enabled = false;
 	/** 数据库列与表达式对应关系 **/
-	protected List<String> classesDirectories = new ArrayList<String>();
-	protected List<String> libDirectories = new ArrayList<String>();
+	private List<String> classesDirectories = new ArrayList<String>();
+	private List<String> libDirectories = new ArrayList<String>();
 	/** 运行模式：development、 deployment **/
-	protected String mode = RuntimeMode.DEPLOYMENT.toString();
+	private String mode = RuntimeMode.DEPLOYMENT.toString();
 	/** 插件目录：默认 plugins;非jar模式的插件时，该值应该是绝对目录地址  **/
-	protected String pluginsDir = "plugins";
+	private String pluginsDir = "plugins";
 	/** 插件地址：绝对地址 **/
-	protected List<String> plugins = new ArrayList<String>();
+	private List<String> plugins = new ArrayList<String>();
 	/** 是否注册插件到Spring上下文 **/
-	protected boolean spring = false;
+	private boolean spring = false;
 	/** 插件是否jar包 **/
-	protected boolean jarPackages = true;
+	private boolean jarPackages = true;
 	/** 是否延时加载、启动插件 **/
-	protected boolean lazy = true;
+	private boolean lazy = true;
 	/** 插件延时加载、启动时间，单位毫秒  **/
-	protected long delay = 0;
+	private long delay = 0;
+	
+	/** 是否自动更新插件 **/
+	private boolean autoUpdate = false;
+	/** 插件自动更新检查周期，单位毫秒  **/
+	private long period = 5000;
 	
 	public boolean isEnabled() {
 		return enabled;
@@ -132,6 +138,22 @@ public class Pf4jProperties {
 
 	public void setDelay(long delay) {
 		this.delay = delay;
+	}
+
+	public boolean isAutoUpdate() {
+		return autoUpdate;
+	}
+
+	public void setAutoUpdate(boolean autoUpdate) {
+		this.autoUpdate = autoUpdate;
+	}
+
+	public long getPeriod() {
+		return period;
+	}
+
+	public void setPeriod(long period) {
+		this.period = period;
 	}
 	
 }

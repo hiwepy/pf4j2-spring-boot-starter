@@ -1,5 +1,4 @@
-logging:
-  log4j:
-    column-configs:
-    - clob: false
-      column: 
+pf4j:
+  update:
+    repositories:
+    - 

@@ -29,11 +29,13 @@ import org.pf4j.spring.boot.ext.Pf4jJarPluginWhitSpringManager;
 import org.pf4j.spring.boot.ext.Pf4jPluginClasspath;
 import org.pf4j.spring.boot.ext.Pf4jPluginManager;
 import org.pf4j.spring.boot.ext.PluginLazyTask;
+import org.pf4j.spring.boot.ext.PluginUpdateTask;
 import org.pf4j.spring.boot.ext.PluginUtils;
 import org.pf4j.spring.boot.ext.PluginsLazyTask;
+import org.pf4j.spring.boot.hooks.Pf4jShutdownHook;
+import org.pf4j.update.UpdateManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -44,15 +46,15 @@ import org.springframework.util.StringUtils;
 
 /**
  * Pf4j 2.x Configuration
+ * 
  * @author <a href="https://github.com/vindell">vindell</a>
  */
 @Configuration
 @ConditionalOnClass({ PluginManager.class })
 @ConditionalOnProperty(prefix = Pf4jProperties.PREFIX, value = "enabled", havingValue = "true")
 @EnableConfigurationProperties(Pf4jProperties.class)
-public class Pf4jAutoConfiguration implements DisposableBean {
+public class Pf4jAutoConfiguration {
 
-	private PluginManager pluginManager;
 	private Logger logger = LoggerFactory.getLogger(Pf4jAutoConfiguration.class);
 	// 实例化Timer类
 	private Timer timer = new Timer(true);
@@ -77,6 +79,19 @@ public class Pf4jAutoConfiguration implements DisposableBean {
 			}
 
 		};
+	}
+
+	@Bean
+	public UpdateManager updateManager(PluginManager pluginManager, Pf4jProperties properties) {
+
+		UpdateManager updateManager = new UpdateManager(pluginManager);
+
+		if (properties.isAutoUpdate()) {
+			timer.schedule(new PluginUpdateTask(pluginManager, updateManager),
+					properties.isLazy() ? properties.getDelay() : 0, properties.getPeriod());
+		}
+		
+		return updateManager;
 	}
 
 	@Bean
@@ -144,24 +159,17 @@ public class Pf4jAutoConfiguration implements DisposableBean {
 			 * 调用Plugin实现类的start()方法:
 			 */
 			pluginManager.startPlugins();
+
 			// 加载、启动绝对路径指定的插件
 			PluginUtils.loadAndStartPlugins(pluginManager, properties.getPlugins());
 		}
 
-		this.pluginManager = pluginManager;
+		/**
+		 * 应用退出时，要调用shutdown来清理资源，关闭网络连接 注意：我们建议应用在JBOSS、Tomcat等容器的退出钩子里调用shutdown方法
+		 */
+		Runtime.getRuntime().addShutdownHook(new Pf4jShutdownHook(pluginManager));
+
 		return pluginManager;
-	}
-
-	@Override
-	public void destroy() throws Exception {
-		// 销毁插件
-		if (pluginManager != null) {
-			/*
-			 * 调用Plugin实现类的stop()方法
-			 */
-			pluginManager.stopPlugins();
-		}
-
 	}
 
 }
