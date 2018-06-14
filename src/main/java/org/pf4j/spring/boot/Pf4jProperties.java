@@ -19,16 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.pf4j.RuntimeMode;
-import org.pf4j.update.UpdateRepository;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * 
- * @className	： Pf4jProperties
- * @description	： TODO(描述这个类的作用)
  * @author 		： <a href="https://github.com/vindell">vindell</a>
- * @date		： 2017年10月31日 下午6:24:59
- * @version 	V1.0
  */
 @ConfigurationProperties(prefix = Pf4jProperties.PREFIX)
 public class Pf4jProperties {
