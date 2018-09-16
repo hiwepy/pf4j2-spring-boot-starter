@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.2.RELEASE</version>
+		<version>2.0.4.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	
@@ -372,7 +372,7 @@
         <maven-surefire-plugin.vertsion>2.21.0</maven-surefire-plugin.vertsion>
 		<maven-nexus-staging-plugin.version>1.6.8</maven-nexus-staging-plugin.version>
 		<slf4j.version>1.7.25</slf4j.version>
-		<pf4j.version>2.2.0</pf4j.version>
+		<pf4j.version>2.4.0</pf4j.version>
 		<pf4j-update.version>2.0.0</pf4j-update.version>
 		<pf4j-spring.version>0.4.0</pf4j-spring.version>
 	</properties>
