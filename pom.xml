@@ -374,7 +374,7 @@
 		<slf4j.version>1.7.25</slf4j.version>
 		<pf4j.version>2.4.0</pf4j.version>
 		<pf4j-update.version>2.0.0</pf4j-update.version>
-		<pf4j-spring.version>0.4.0</pf4j-spring.version>
+		<pf4j-spring.version>0.5.0</pf4j-spring.version>
 	</properties>
 
 	<repositories>
