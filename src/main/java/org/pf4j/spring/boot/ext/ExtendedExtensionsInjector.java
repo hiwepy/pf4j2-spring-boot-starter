@@ -161,8 +161,22 @@ public class ExtendedExtensionsInjector extends ExtensionsInjector {
 	}
 
 	protected void registerRequestMappingIfNecessary(String controllerBeanName) {
+
+		RequestMappingHandlerMapping requestMappingHandlerMapping = getRequestMappingHandlerMapping();
 		// spring 3.1 开始
 		ReflectionUtils.invokeMethod(detectHandlerMethodsMethod, requestMappingHandlerMapping, controllerBeanName);
+
+	}
+	
+	protected RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
+		try {
+			if (requestMappingHandlerMapping != null) {
+				return requestMappingHandlerMapping;
+			}
+			return beanFactory.getBean(RequestMappingHandlerMapping.class);
+		} catch (Exception e) {
+			throw new IllegalArgumentException("applicationContext must has RequestMappingHandlerMapping");
+		}
 	}
 
 }
