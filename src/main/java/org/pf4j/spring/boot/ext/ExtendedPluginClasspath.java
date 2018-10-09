@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, vindell (https://github.com/vindell).
+ * Copyright (c) 2018, vindell (https://github.com/vindell).
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -19,18 +19,18 @@ import java.util.List;
 
 import org.pf4j.DefaultPluginClasspath;
 
-public class Pf4jPluginClasspath extends DefaultPluginClasspath {
+public class ExtendedPluginClasspath extends DefaultPluginClasspath {
 
-	public Pf4jPluginClasspath(String... classesDirectories) {
+	public ExtendedPluginClasspath(String... classesDirectories) {
 		super();
 		addClassesDirectories(classesDirectories);
 	}
 
-	public Pf4jPluginClasspath(List<String> classesDirectories, List<String> libDirectories) {
+	public ExtendedPluginClasspath(List<String> classesDirectories, List<String> libDirectories) {
 		this(classesDirectories.toArray(new String[classesDirectories.size()]), libDirectories.toArray(new String[libDirectories.size()]));
 	}
 	
-	public Pf4jPluginClasspath(String[] libDirectories, String... classesDirectories) {
+	public ExtendedPluginClasspath(String[] libDirectories, String... classesDirectories) {
 		super();
 		addClassesDirectories(classesDirectories);
 		addLibDirectories(libDirectories);

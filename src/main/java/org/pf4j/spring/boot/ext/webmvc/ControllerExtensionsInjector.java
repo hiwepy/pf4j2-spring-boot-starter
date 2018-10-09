@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, vindell (https://github.com/vindell).
+ * Copyright (c) 2018, vindell (https://github.com/vindell).
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.pf4j.spring.boot.ext;
+package org.pf4j.spring.boot.ext.webmvc;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -27,14 +27,8 @@ import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
 import org.springframework.core.MethodIntrospector;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ClassUtils;
@@ -47,9 +41,9 @@ import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-public class Pf4jControllerExtensionsInjector implements BeanFactoryPostProcessor, ApplicationContextAware {
+public class ControllerExtensionsInjector{
 
-	private static final Logger log = LoggerFactory.getLogger(Pf4jControllerExtensionsInjector.class);
+	private static final Logger log = LoggerFactory.getLogger(ControllerExtensionsInjector.class);
 
 	// RequestMappingHandlerMapping
 	protected static Method detectHandlerMethodsMethod = ReflectionUtils.findMethod(RequestMappingHandlerMapping.class,
@@ -63,35 +57,25 @@ public class Pf4jControllerExtensionsInjector implements BeanFactoryPostProcesso
 	protected static Field injectionMetadataCacheField = ReflectionUtils
 			.findField(AutowiredAnnotationBeanPostProcessor.class, "injectionMetadataCache");
 
-	private DefaultListableBeanFactory beanFactory;
-	private ApplicationContext applicationContext;
-
-	// millis
-	@Autowired
-	protected RequestMappingHandlerMapping requestMappingHandlerMapping;
-
 	static {
 		detectHandlerMethodsMethod.setAccessible(true);
 		getMappingForMethodMethod.setAccessible(true);
 		mappingRegistryField.setAccessible(true);
 		injectionMetadataCacheField.setAccessible(true);
 	}
+	
+	protected final RequestMappingHandlerMapping requestMappingHandlerMapping;
+    protected final PluginManager pluginManager;
+    protected final AbstractAutowireCapableBeanFactory beanFactory;
 
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) {
-		this.applicationContext = applicationContext;
-	}
+    public ControllerExtensionsInjector(PluginManager pluginManager, RequestMappingHandlerMapping requestMappingHandlerMapping, AbstractAutowireCapableBeanFactory beanFactory) {
+        this.requestMappingHandlerMapping = requestMappingHandlerMapping;
+        this.pluginManager = pluginManager;
+        this.beanFactory = beanFactory;
+    }
 
-	@Override
-	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+    public void injectExtensions() {
 
-		if (!DefaultListableBeanFactory.class.isAssignableFrom(beanFactory.getClass())) {
-			log.warn("BeanFactory must be DefaultListableBeanFactory type");
-			return;
-		}
-		this.beanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
-
-		PluginManager pluginManager = beanFactory.getBean(PluginManager.class);
 		ExtensionFactory extensionFactory = pluginManager.getExtensionFactory();
 
 		// add extensions from classpath (non plugin)
@@ -106,11 +90,11 @@ public class Pf4jControllerExtensionsInjector implements BeanFactoryPostProcesso
 					// 1、如果RequestMapping存在则移除
 					removeRequestMappingIfNecessary(extensionClassName);
 					// 2、注册新的Controller
-					getBeanFactory().registerSingleton(extensionClassName, bean);
+					beanFactory.registerSingleton(extensionClassName, bean);
 					// 3、注册新的RequestMapping
 					registerRequestMappingIfNecessary(extensionClassName);
 				} else {
-					getBeanFactory().registerSingleton(extensionClassName, bean);
+					beanFactory.registerSingleton(extensionClassName, bean);
 				}
 			} catch (ClassNotFoundException e) {
 				log.error(e.getMessage(), e);
@@ -133,11 +117,11 @@ public class Pf4jControllerExtensionsInjector implements BeanFactoryPostProcesso
 						// 1、如果RequestMapping存在则移除
 						removeRequestMappingIfNecessary(extensionClassName);
 						// 2、注册新的Controller
-						getBeanFactory().registerSingleton(extensionClassName, bean);
+						beanFactory.registerSingleton(extensionClassName, bean);
 						// 3、注册新的RequestMapping
 						registerRequestMappingIfNecessary(extensionClassName);
 					} else {
-						getBeanFactory().registerSingleton(extensionClassName, bean);
+						beanFactory.registerSingleton(extensionClassName, bean);
 					}
 				} catch (ClassNotFoundException e) {
 					log.error(e.getMessage(), e);
@@ -154,14 +138,12 @@ public class Pf4jControllerExtensionsInjector implements BeanFactoryPostProcesso
 	@SuppressWarnings("unchecked")
 	protected void removeRequestMappingIfNecessary(String controllerBeanName) {
 
-		if (!getBeanFactory().containsBean(controllerBeanName)) {
+		if (!beanFactory.containsBean(controllerBeanName)) {
 			return;
 		}
-
-		RequestMappingHandlerMapping requestMappingHandlerMapping = getRequestMappingHandlerMapping();
-
+		
 		// remove old
-		Class<?> handlerType = getApplicationContext().getType(controllerBeanName);
+		Class<?> handlerType = beanFactory.getType(controllerBeanName);
 		final Class<?> userType = ClassUtils.getUserClass(handlerType);
 
 		/*
@@ -220,30 +202,8 @@ public class Pf4jControllerExtensionsInjector implements BeanFactoryPostProcesso
 	}
 
 	protected void registerRequestMappingIfNecessary(String controllerBeanName) {
-
-		RequestMappingHandlerMapping requestMappingHandlerMapping = getRequestMappingHandlerMapping();
 		// spring 3.1 开始
 		ReflectionUtils.invokeMethod(detectHandlerMethodsMethod, requestMappingHandlerMapping, controllerBeanName);
-
-	}
-
-	protected RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
-		try {
-			if (requestMappingHandlerMapping != null) {
-				return requestMappingHandlerMapping;
-			}
-			return getApplicationContext().getBean(RequestMappingHandlerMapping.class);
-		} catch (Exception e) {
-			throw new IllegalArgumentException("applicationContext must has RequestMappingHandlerMapping");
-		}
-	}
-
-	public DefaultListableBeanFactory getBeanFactory() {
-		return beanFactory;
-	}
-
-	public ApplicationContext getApplicationContext() {
-		return applicationContext;
 	}
 
 }

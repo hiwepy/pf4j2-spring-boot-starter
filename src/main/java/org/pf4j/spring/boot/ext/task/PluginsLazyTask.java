@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, vindell (https://github.com/vindell).
+ * Copyright (c) 2018, vindell (https://github.com/vindell).
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,29 +13,29 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.pf4j.spring.boot.ext;
+package org.pf4j.spring.boot.ext.task;
 
+import java.util.List;
 import java.util.TimerTask;
 
 import org.pf4j.PluginManager;
+import org.pf4j.spring.boot.ext.utils.PluginUtils;
 
-public class PluginLazyTask extends TimerTask {
-
-	PluginManager pluginManager = null;
+public class PluginsLazyTask extends TimerTask {
 	
-	public PluginLazyTask(PluginManager pluginManager) {
+	private PluginManager pluginManager = null;
+	private List<String> plugins = null;
+	
+	public PluginsLazyTask(PluginManager pluginManager, List<String> plugins) {
 		super();
 		this.pluginManager = pluginManager;
+		this.plugins = plugins;
 	}
 
 	@Override
 	public void run() {
 		
-		// 加载插件
-		pluginManager.loadPlugins();
-
-		// 启动插件
-		pluginManager.startPlugins();
+		PluginUtils.loadAndStartPlugins(pluginManager, plugins);
 		
 		// 执行完成后取消线程
 		this.cancel();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, vindell (https://github.com/vindell).
+ * Copyright (c) 2018, vindell (https://github.com/vindell).
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,32 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.pf4j.spring.boot.ext;
+package org.pf4j.spring.boot.ext.update;
 
-import java.util.TimerTask;
+import java.util.List;
 
-import org.pf4j.PluginManager;
+import org.pf4j.update.UpdateRepository;
 
-public class PluginInstallTask extends TimerTask {
+/**
+ * TODO
+ * @author 		： <a href="https://github.com/vindell">vindell</a>
+ */
+public interface UpdateRepositoryProvider {
 
-	PluginManager pluginManager = null;
+	List<UpdateRepository> getRepos();
 	
-	public PluginInstallTask(PluginManager pluginManager) {
-		super();
-		this.pluginManager = pluginManager;
-	}
-
-	@Override
-	public void run() {
-		
-		// 加载插件
-		pluginManager.loadPlugins();
-
-		// 启动插件
-		pluginManager.startPlugins();
-		
-		// 执行完成后取消线程
-		this.cancel();
-	}
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, vindell (https://github.com/vindell).
+ * Copyright (c) 2018, vindell (https://github.com/vindell).
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.pf4j.spring.boot.ext;
+package org.pf4j.spring.boot.ext.task;
 
 import java.util.List;
 import java.util.TimerTask;
@@ -31,7 +31,7 @@ public class PluginUpdateTask extends TimerTask {
 	private PluginManager pluginManager = null;
 	private UpdateManager updateManager = null;
 	
-	public PluginUpdateTask(PluginManager pluginManager,UpdateManager updateManager) {
+	public PluginUpdateTask(PluginManager pluginManager, UpdateManager updateManager) {
 		super();
 		this.pluginManager = pluginManager;
 		this.updateManager = updateManager;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, vindell (https://github.com/vindell).
+ * Copyright (c) 2018, vindell (https://github.com/vindell).
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -16,24 +16,25 @@
 package org.pf4j.spring.boot;
 
 import java.io.File;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Timer;
 
-import org.pf4j.PluginClasspath;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginManager;
 import org.pf4j.PluginStateEvent;
 import org.pf4j.PluginStateListener;
 import org.pf4j.RuntimeMode;
-import org.pf4j.spring.boot.ext.Pf4jJarPluginManager;
-import org.pf4j.spring.boot.ext.Pf4jJarPluginWhitSpringManager;
-import org.pf4j.spring.boot.ext.Pf4jPluginClasspath;
-import org.pf4j.spring.boot.ext.Pf4jPluginManager;
-import org.pf4j.spring.boot.ext.PluginLazyTask;
-import org.pf4j.spring.boot.ext.PluginUpdateTask;
-import org.pf4j.spring.boot.ext.PluginUtils;
-import org.pf4j.spring.boot.ext.PluginsLazyTask;
+import org.pf4j.spring.boot.ext.ExtendedSpringPluginManager;
+import org.pf4j.spring.boot.ext.task.PluginLazyTask;
+import org.pf4j.spring.boot.ext.task.PluginUpdateTask;
+import org.pf4j.spring.boot.ext.task.PluginsLazyTask;
+import org.pf4j.spring.boot.ext.update.DefaultUpdateRepositoryProvider;
+import org.pf4j.spring.boot.ext.update.UpdateRepositoryProvider;
+import org.pf4j.spring.boot.ext.utils.PluginUtils;
 import org.pf4j.spring.boot.hooks.Pf4jShutdownHook;
 import org.pf4j.update.UpdateManager;
+import org.pf4j.update.UpdateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -42,7 +43,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
  * Pf4j 2.x Configuration
@@ -82,62 +85,28 @@ public class Pf4jAutoConfiguration {
 	}
 
 	@Bean
-	public UpdateManager updateManager(PluginManager pluginManager, Pf4jProperties properties) {
-
-		UpdateManager updateManager = new UpdateManager(pluginManager);
-
-		if (properties.isAutoUpdate()) {
-			timer.schedule(new PluginUpdateTask(pluginManager, updateManager),
-					properties.isLazy() ? properties.getDelay() : 0, properties.getPeriod());
-		}
-		
-		return updateManager;
-	}
-
-	@Bean
-	public PluginManager pluginManager(Pf4jProperties properties) {
+	public PluginManager pluginManager(RequestMappingHandlerMapping requestMappingHandlerMapping, Pf4jProperties properties) {
 
 		// 设置运行模式
 		RuntimeMode mode = RuntimeMode.byName(properties.getMode());
 		System.setProperty("pf4j.mode", mode.toString());
-
+		
 		// 设置插件目录
-		String pluginsDir = StringUtils.hasText(properties.getPluginsDir()) ? properties.getPluginsDir() : "plugins";
-		System.setProperty("pf4j.pluginsDir", pluginsDir);
+		String pluginsRoot = StringUtils.hasText(properties.getPluginsRoot()) ? properties.getPluginsRoot() : "plugins";
+		System.setProperty("pf4j.pluginsDir", pluginsRoot);
 		String apphome = System.getProperty("app.home");
 		if (RuntimeMode.DEPLOYMENT.compareTo(RuntimeMode.byName(properties.getMode())) == 0
 				&& StringUtils.hasText(apphome)) {
-			System.setProperty("pf4j.pluginsDir", apphome + File.separator + pluginsDir);
+			System.setProperty("pf4j.pluginsDir", apphome + File.separator + pluginsRoot);
 		}
-
+		
 		// final PluginManager pluginManager = new DefaultPluginManager();
 		// final PluginManager pluginManager = new JarPluginManager();
 
-		PluginManager pluginManager = null;
-		if (properties.isJarPackages()) {
-
-			PluginClasspath pluginClasspath = new Pf4jPluginClasspath(properties.getClassesDirectories(),
-					properties.getLibDirectories());
-
-			if (properties.isSpring()) {
-
-				/**
-				 * 使用Spring时需编写如下的初始化逻辑
-				 * 
-				 * @Configuration public class Pf4jConfig {
-				 * @Bean public ExtensionsInjector extensionsInjector() { return new
-				 *       ExtensionsInjector(); } }
-				 * 
-				 */
-
-				pluginManager = new Pf4jJarPluginWhitSpringManager(pluginClasspath);
-			} else {
-				pluginManager = new Pf4jJarPluginManager(pluginClasspath);
-			}
-		} else {
-			pluginManager = new Pf4jPluginManager(pluginsDir);
-		}
-
+		ExtendedSpringPluginManager pluginManager = new ExtendedSpringPluginManager(pluginsRoot, requestMappingHandlerMapping);
+		pluginManager.setClassesDirectories(properties.getClassesDirectories());
+		pluginManager.setLibDirectories(properties.getLibDirectories());
+				
 		/*
 		 * pluginManager.enablePlugin(pluginId) pluginManager.disablePlugin(pluginId)
 		 * pluginManager.deletePlugin(pluginId)
@@ -170,6 +139,31 @@ public class Pf4jAutoConfiguration {
 		Runtime.getRuntime().addShutdownHook(new Pf4jShutdownHook(pluginManager));
 
 		return pluginManager;
+	}
+	
+	@Bean
+	@ConditionalOnMissingBean
+	public UpdateRepositoryProvider updateRepositoryProvider(Pf4jProperties properties) {
+		return new DefaultUpdateRepositoryProvider(properties.getRepos());
+	}
+	
+	@Bean
+	public UpdateManager updateManager(PluginManager pluginManager, UpdateRepositoryProvider updateRepositoryProvider,
+			Pf4jProperties properties) {
+		UpdateManager updateManager = null;
+		List<UpdateRepository> repos = updateRepositoryProvider.getRepos();
+		if (StringUtils.hasText(properties.getReposJsonPath())) {
+			updateManager = new UpdateManager(pluginManager, Paths.get(properties.getReposJsonPath()));
+		} else if (!CollectionUtils.isEmpty(repos)) {
+			updateManager = new UpdateManager(pluginManager, repos);
+		} else {
+			updateManager = new UpdateManager(pluginManager);
+		}
+		// auto update
+		if(properties.isAutoUpdate()) {
+			timer.schedule(new PluginUpdateTask(pluginManager, updateManager), properties.getPeriod());
+		}
+		return updateManager;
 	}
 
 }
