@@ -56,11 +56,11 @@ public class ExtendedSpringPluginManager extends SpringPluginManager {
     @PostConstruct
     public void init() {
     	
-    	 loadPlugins();
-         startPlugins();
+    	loadPlugins();
+        startPlugins();
     	
         AbstractAutowireCapableBeanFactory beanFactory = (AbstractAutowireCapableBeanFactory) getApplicationContext().getAutowireCapableBeanFactory();
-        ExtendedExtensionsInjector extensionsInjector = new ExtendedExtensionsInjector(this, beanFactory, requestMappingHandlerMapping);
+        ExtendedExtensionsInjector extensionsInjector = new ExtendedExtensionsInjector(this, beanFactory);
         extensionsInjector.injectExtensions();
     }
 	

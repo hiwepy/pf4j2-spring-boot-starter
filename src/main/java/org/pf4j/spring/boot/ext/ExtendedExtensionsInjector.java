@@ -60,14 +60,14 @@ public class ExtendedExtensionsInjector extends ExtensionsInjector {
 		injectionMetadataCacheField.setAccessible(true);
 	}
 	
-	protected final RequestMappingHandlerMapping requestMappingHandlerMapping;
+	protected RequestMappingHandlerMapping requestMappingHandlerMapping;
 	
-	public ExtendedExtensionsInjector(PluginManager pluginManager, AbstractAutowireCapableBeanFactory beanFactory, RequestMappingHandlerMapping requestMappingHandlerMapping) {
+	public ExtendedExtensionsInjector(PluginManager pluginManager, AbstractAutowireCapableBeanFactory beanFactory) {
 		super(pluginManager, beanFactory);
-		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
+		this.requestMappingHandlerMapping = beanFactory.getBean(RequestMappingHandlerMapping.class);
 	}
 	
-  /**
+   /**
     * Register an extension as bean.
     * Current implementation register extension as singleton using {@code beanFactory.registerSingleton()}.
     * The extension instance is created using {@code pluginManager.getExtensionFactory().create(extensionClass)}.
