@@ -15,8 +15,6 @@
  */
 package org.pf4j.spring.boot.ext;
 
-import java.util.List;
-
 import org.pf4j.DefaultPluginClasspath;
 
 public class ExtendedPluginClasspath extends DefaultPluginClasspath {
@@ -26,15 +24,10 @@ public class ExtendedPluginClasspath extends DefaultPluginClasspath {
 		addClassesDirectories(classesDirectories);
 	}
 
-	public ExtendedPluginClasspath(List<String> classesDirectories, List<String> libDirectories) {
-		this(classesDirectories.toArray(new String[classesDirectories.size()]), libDirectories.toArray(new String[libDirectories.size()]));
-	}
-	
 	public ExtendedPluginClasspath(String[] libDirectories, String... classesDirectories) {
 		super();
 		addClassesDirectories(classesDirectories);
 		addLibDirectories(libDirectories);
 	}
-
 
 }

@@ -65,23 +65,17 @@ public class ExtendedPluginManager extends DefaultPluginManager {
 	@Override
 	protected PluginClasspath createPluginClasspath() {
 		return isDevelopment() ? new DevelopmentPluginClasspath()
-				: new ExtendedPluginClasspath(getClassesDirectories(), getLibDirectories());
+				: new ExtendedPluginClasspath(
+						getClassesDirectories().toArray(new String[getClassesDirectories().size()]),
+						getLibDirectories().toArray(new String[getClassesDirectories().size()]));
 	}
 
 	public List<String> getClassesDirectories() {
 		return classesDirectories;
 	}
 
-	public void setClassesDirectories(List<String> classesDirectories) {
-		this.classesDirectories = classesDirectories;
-	}
-
 	public List<String> getLibDirectories() {
 		return libDirectories;
-	}
-
-	public void setLibDirectories(List<String> libDirectories) {
-		this.libDirectories = libDirectories;
 	}
 
 }

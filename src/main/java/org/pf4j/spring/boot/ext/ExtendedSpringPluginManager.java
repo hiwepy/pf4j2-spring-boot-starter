@@ -42,26 +42,47 @@ public class ExtendedSpringPluginManager extends SpringPluginManager {
 	private List<String> libDirectories = new ArrayList<String>();
 	
 	private final RequestMappingHandlerMapping requestMappingHandlerMapping;
-	
+
 	public ExtendedSpringPluginManager(File pluginsRoot, RequestMappingHandlerMapping requestMappingHandlerMapping) {
 		super(pluginsRoot.toPath());
 		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
 	}
-	
+
+	public ExtendedSpringPluginManager(File pluginsRoot, RequestMappingHandlerMapping requestMappingHandlerMapping,
+			List<String> classesDirectories, List<String> libDirectories) {
+		super(pluginsRoot.toPath());
+		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
+	}
+
 	public ExtendedSpringPluginManager(String pluginsRoot, RequestMappingHandlerMapping requestMappingHandlerMapping) {
 		super(Paths.get(pluginsRoot));
 		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
 	}
-	
+
+	public ExtendedSpringPluginManager(String pluginsRoot, RequestMappingHandlerMapping requestMappingHandlerMapping,
+			List<String> classesDirectories, List<String> libDirectories) {
+		super(Paths.get(pluginsRoot));
+		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
+	}
+
 	public ExtendedSpringPluginManager(Path pluginsRoot, RequestMappingHandlerMapping requestMappingHandlerMapping) {
+		super(pluginsRoot);
+		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
+	}
+
+	public ExtendedSpringPluginManager(Path pluginsRoot, RequestMappingHandlerMapping requestMappingHandlerMapping,
+			List<String> classesDirectories, List<String> libDirectories) {
 		super(pluginsRoot);
 		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
 	}
 	
 	@Override
 	protected PluginClasspath createPluginClasspath() {
-		return isDevelopment() ? new DevelopmentPluginClasspath() : new ExtendedPluginClasspath(getClassesDirectories(), getLibDirectories());
-    }
+		return isDevelopment() ? new DevelopmentPluginClasspath()
+				: new ExtendedPluginClasspath(
+						getClassesDirectories().toArray(new String[getClassesDirectories().size()]),
+						getLibDirectories().toArray(new String[getClassesDirectories().size()]));
+	}
 	
 	/**
      * This method load, start plugins and inject controller extensions in Spring
@@ -80,16 +101,8 @@ public class ExtendedSpringPluginManager extends SpringPluginManager {
 		return classesDirectories;
 	}
 
-	public void setClassesDirectories(List<String> classesDirectories) {
-		this.classesDirectories = classesDirectories;
-	}
-
 	public List<String> getLibDirectories() {
 		return libDirectories;
-	}
-
-	public void setLibDirectories(List<String> libDirectories) {
-		this.libDirectories = libDirectories;
 	}
 	
 }
