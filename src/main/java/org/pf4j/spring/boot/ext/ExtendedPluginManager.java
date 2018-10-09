@@ -18,64 +18,21 @@ package org.pf4j.spring.boot.ext;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.pf4j.DefaultPluginManager;
-import org.pf4j.DevelopmentPluginClasspath;
-import org.pf4j.PluginClasspath;
 
 public class ExtendedPluginManager extends DefaultPluginManager {
 
-	/** Extended Plugin Class Directory **/
-	private List<String> classesDirectories = new ArrayList<String>();
-	/** Extended Plugin Jar Directory **/
-	private List<String> libDirectories = new ArrayList<String>();
-
 	public ExtendedPluginManager(File pluginsRoot) {
 		super(pluginsRoot.toPath());
-	}
-
-	public ExtendedPluginManager(File pluginsRoot, List<String> classesDirectories, List<String> libDirectories) {
-		super(pluginsRoot.toPath());
-		this.classesDirectories.addAll(classesDirectories);
-		this.libDirectories.addAll(libDirectories);
 	}
 
 	public ExtendedPluginManager(String pluginsRoot) {
 		super(Paths.get(pluginsRoot));
 	}
 
-	public ExtendedPluginManager(String pluginsRoot, List<String> classesDirectories, List<String> libDirectories) {
-		super(Paths.get(pluginsRoot));
-		this.classesDirectories.addAll(classesDirectories);
-		this.libDirectories.addAll(libDirectories);
-	}
-
 	public ExtendedPluginManager(Path pluginsRoot) {
 		super(pluginsRoot);
-	}
-
-	public ExtendedPluginManager(Path pluginsRoot, List<String> classesDirectories, List<String> libDirectories) {
-		super(pluginsRoot);
-		this.classesDirectories.addAll(classesDirectories);
-		this.libDirectories.addAll(libDirectories);
-	}
-	
-	@Override
-	protected PluginClasspath createPluginClasspath() {
-		return isDevelopment() ? new DevelopmentPluginClasspath()
-				: new ExtendedPluginClasspath(
-						getClassesDirectories().toArray(new String[getClassesDirectories().size()]),
-						getLibDirectories().toArray(new String[getClassesDirectories().size()]));
-	}
-
-	public List<String> getClassesDirectories() {
-		return classesDirectories;
-	}
-
-	public List<String> getLibDirectories() {
-		return libDirectories;
 	}
 
 }

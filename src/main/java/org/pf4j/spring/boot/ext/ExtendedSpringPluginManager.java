@@ -18,15 +18,10 @@ package org.pf4j.spring.boot.ext;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.pf4j.DevelopmentPluginClasspath;
-import org.pf4j.PluginClasspath;
 import org.pf4j.spring.SpringPluginManager;
-import org.pf4j.spring.boot.ext.webmvc.ControllerExtensionsInjector;
 import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
@@ -36,11 +31,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  */
 public class ExtendedSpringPluginManager extends SpringPluginManager {
 
-	/** Extended Plugin Class Directory **/
-	private List<String> classesDirectories = new ArrayList<String>();
-	/** Extended Plugin Jar Directory **/
-	private List<String> libDirectories = new ArrayList<String>();
-	
 	private final RequestMappingHandlerMapping requestMappingHandlerMapping;
 
 	public ExtendedSpringPluginManager(File pluginsRoot, RequestMappingHandlerMapping requestMappingHandlerMapping) {
@@ -48,40 +38,16 @@ public class ExtendedSpringPluginManager extends SpringPluginManager {
 		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
 	}
 
-	public ExtendedSpringPluginManager(File pluginsRoot, RequestMappingHandlerMapping requestMappingHandlerMapping,
-			List<String> classesDirectories, List<String> libDirectories) {
-		super(pluginsRoot.toPath());
-		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
-	}
 
 	public ExtendedSpringPluginManager(String pluginsRoot, RequestMappingHandlerMapping requestMappingHandlerMapping) {
 		super(Paths.get(pluginsRoot));
 		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
 	}
 
-	public ExtendedSpringPluginManager(String pluginsRoot, RequestMappingHandlerMapping requestMappingHandlerMapping,
-			List<String> classesDirectories, List<String> libDirectories) {
-		super(Paths.get(pluginsRoot));
-		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
-	}
 
 	public ExtendedSpringPluginManager(Path pluginsRoot, RequestMappingHandlerMapping requestMappingHandlerMapping) {
 		super(pluginsRoot);
 		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
-	}
-
-	public ExtendedSpringPluginManager(Path pluginsRoot, RequestMappingHandlerMapping requestMappingHandlerMapping,
-			List<String> classesDirectories, List<String> libDirectories) {
-		super(pluginsRoot);
-		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
-	}
-	
-	@Override
-	protected PluginClasspath createPluginClasspath() {
-		return isDevelopment() ? new DevelopmentPluginClasspath()
-				: new ExtendedPluginClasspath(
-						getClassesDirectories().toArray(new String[getClassesDirectories().size()]),
-						getLibDirectories().toArray(new String[getClassesDirectories().size()]));
 	}
 	
 	/**
@@ -90,19 +56,12 @@ public class ExtendedSpringPluginManager extends SpringPluginManager {
     @PostConstruct
     public void init() {
     	
-    	super.init();
+    	 loadPlugins();
+         startPlugins();
     	
         AbstractAutowireCapableBeanFactory beanFactory = (AbstractAutowireCapableBeanFactory) getApplicationContext().getAutowireCapableBeanFactory();
-        ControllerExtensionsInjector extensionsInjector = new ControllerExtensionsInjector(this, requestMappingHandlerMapping, beanFactory);
+        ExtendedExtensionsInjector extensionsInjector = new ExtendedExtensionsInjector(this, beanFactory, requestMappingHandlerMapping);
         extensionsInjector.injectExtensions();
     }
-
-	public List<String> getClassesDirectories() {
-		return classesDirectories;
-	}
-
-	public List<String> getLibDirectories() {
-		return libDirectories;
-	}
 	
 }

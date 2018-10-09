@@ -104,7 +104,7 @@ public class Pf4jAutoConfiguration {
 		// final PluginManager pluginManager = new JarPluginManager();
 
 		ExtendedSpringPluginManager pluginManager = new ExtendedSpringPluginManager(pluginsRoot,
-				requestMappingHandlerMapping, properties.getClassesDirectories(), properties.getLibDirectories());
+				requestMappingHandlerMapping);
 				
 		/*
 		 * pluginManager.enablePlugin(pluginId) pluginManager.disablePlugin(pluginId)

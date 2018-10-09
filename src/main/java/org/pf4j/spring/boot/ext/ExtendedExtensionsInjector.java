@@ -13,38 +13,34 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.pf4j.spring.boot.ext.webmvc;
+package org.pf4j.spring.boot.ext;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.pf4j.ExtensionFactory;
 import org.pf4j.PluginManager;
-import org.pf4j.PluginWrapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.pf4j.spring.ExtensionsInjector;
+import org.pf4j.spring.boot.ext.utils.InjectorUtils;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
 import org.springframework.core.MethodIntrospector;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.PathMatcher;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-public class ControllerExtensionsInjector{
-
-	private static final Logger log = LoggerFactory.getLogger(ControllerExtensionsInjector.class);
-
+/**
+ * TODO
+ * @author 		： <a href="https://github.com/vindell">vindell</a>
+ */
+public class ExtendedExtensionsInjector extends ExtensionsInjector {
+	
 	// RequestMappingHandlerMapping
 	protected static Method detectHandlerMethodsMethod = ReflectionUtils.findMethod(RequestMappingHandlerMapping.class,
 			"detectHandlerMethods", Object.class);
@@ -65,76 +61,39 @@ public class ControllerExtensionsInjector{
 	}
 	
 	protected final RequestMappingHandlerMapping requestMappingHandlerMapping;
-    protected final PluginManager pluginManager;
-    protected final AbstractAutowireCapableBeanFactory beanFactory;
-
-    public ControllerExtensionsInjector(PluginManager pluginManager, RequestMappingHandlerMapping requestMappingHandlerMapping, AbstractAutowireCapableBeanFactory beanFactory) {
-        this.requestMappingHandlerMapping = requestMappingHandlerMapping;
-        this.pluginManager = pluginManager;
-        this.beanFactory = beanFactory;
-    }
-
-    public void injectExtensions() {
-
-		ExtensionFactory extensionFactory = pluginManager.getExtensionFactory();
-
-		// add extensions from classpath (non plugin)
-		Set<String> extensionClassNames = pluginManager.getExtensionClassNames(null);
-		for (String extensionClassName : extensionClassNames) {
-			try {
-				log.debug("Register extension '{}' as bean", extensionClassName);
-				Class<?> extensionClass = getClass().getClassLoader().loadClass(extensionClassName);
-				Object bean = extensionFactory.create(extensionClass);
-				// 判断对象是否是Controller
-				if (isController(bean)) {
-					// 1、如果RequestMapping存在则移除
-					removeRequestMappingIfNecessary(extensionClassName);
-					// 2、注册新的Controller
-					beanFactory.registerSingleton(extensionClassName, bean);
-					// 3、注册新的RequestMapping
-					registerRequestMappingIfNecessary(extensionClassName);
-				} else {
-					beanFactory.registerSingleton(extensionClassName, bean);
-				}
-			} catch (ClassNotFoundException e) {
-				log.error(e.getMessage(), e);
-			}
-		}
-
-		// add extensions for each started plugin
-		List<PluginWrapper> startedPlugins = pluginManager.getStartedPlugins();
-		for (PluginWrapper plugin : startedPlugins) {
-			log.debug("Registering extensions of the plugin '{}' as beans", plugin.getPluginId());
-			extensionClassNames = pluginManager.getExtensionClassNames(plugin.getPluginId());
-			for (String extensionClassName : extensionClassNames) {
-				try {
-					log.debug("Register extension '{}' as bean", extensionClassName);
-					Class<?> extensionClass = plugin.getPluginClassLoader().loadClass(extensionClassName);
-					Object bean = extensionFactory.create(extensionClass);
-					beanFactory.registerSingleton(extensionClassName, bean);
-					// 判断对象是否是Controller
-					if (isController(bean)) {
-						// 1、如果RequestMapping存在则移除
-						removeRequestMappingIfNecessary(extensionClassName);
-						// 2、注册新的Controller
-						beanFactory.registerSingleton(extensionClassName, bean);
-						// 3、注册新的RequestMapping
-						registerRequestMappingIfNecessary(extensionClassName);
-					} else {
-						beanFactory.registerSingleton(extensionClassName, bean);
-					}
-				} catch (ClassNotFoundException e) {
-					log.error(e.getMessage(), e);
-				}
-			}
-		}
+	
+	public ExtendedExtensionsInjector(PluginManager pluginManager, AbstractAutowireCapableBeanFactory beanFactory, RequestMappingHandlerMapping requestMappingHandlerMapping) {
+		super(pluginManager, beanFactory);
+		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
 	}
-
-	protected boolean isController(Object bean) {
-		return !ArrayUtils.isEmpty(bean.getClass().getAnnotationsByType(RestController.class))
-				|| !ArrayUtils.isEmpty(bean.getClass().getAnnotationsByType(Controller.class));
+	
+  /**
+    * Register an extension as bean.
+    * Current implementation register extension as singleton using {@code beanFactory.registerSingleton()}.
+    * The extension instance is created using {@code pluginManager.getExtensionFactory().create(extensionClass)}.
+    * The bean name is the extension class name.
+    * Override this method if you wish other register strategy.
+    */
+	@Override
+	protected void registerExtension(Class<?> extensionClass) {
+       
+		Object extension = pluginManager.getExtensionFactory().create(extensionClass);
+		
+		String beanName = InjectorUtils.getBeanName(extension, extension.getClass().getName());
+		// 判断对象是否是Controller
+		if (InjectorUtils.isController(extension)) {
+			// 1、如果RequestMapping存在则移除
+			removeRequestMappingIfNecessary(beanName);
+			// 2、注册新的Controller
+			beanFactory.registerSingleton(beanName, extension);
+			// 3、注册新的RequestMapping
+			registerRequestMappingIfNecessary(beanName);
+		} else {
+			beanFactory.registerSingleton(beanName, extension);
+		}
+		
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	protected void removeRequestMappingIfNecessary(String controllerBeanName) {
 
