@@ -36,12 +36,30 @@ public class ExtendedPluginManager extends DefaultPluginManager {
 		super(pluginsRoot.toPath());
 	}
 
+	public ExtendedPluginManager(File pluginsRoot, List<String> classesDirectories, List<String> libDirectories) {
+		super(pluginsRoot.toPath());
+		this.classesDirectories.addAll(classesDirectories);
+		this.libDirectories.addAll(libDirectories);
+	}
+
 	public ExtendedPluginManager(String pluginsRoot) {
 		super(Paths.get(pluginsRoot));
 	}
 
+	public ExtendedPluginManager(String pluginsRoot, List<String> classesDirectories, List<String> libDirectories) {
+		super(Paths.get(pluginsRoot));
+		this.classesDirectories.addAll(classesDirectories);
+		this.libDirectories.addAll(libDirectories);
+	}
+
 	public ExtendedPluginManager(Path pluginsRoot) {
 		super(pluginsRoot);
+	}
+
+	public ExtendedPluginManager(Path pluginsRoot, List<String> classesDirectories, List<String> libDirectories) {
+		super(pluginsRoot);
+		this.classesDirectories.addAll(classesDirectories);
+		this.libDirectories.addAll(libDirectories);
 	}
 	
 	@Override
