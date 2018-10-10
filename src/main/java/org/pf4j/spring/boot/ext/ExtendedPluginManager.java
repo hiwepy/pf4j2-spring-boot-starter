@@ -28,37 +28,37 @@ import org.pf4j.spring.SpringExtensionFactory;
 
 public class ExtendedPluginManager extends DefaultPluginManager {
 
-	/** Whether to register the object to the spring context */
-	private boolean injectable = true;
+	/** Whether to automatically inject dependent objects */
+	private boolean autowire = true;
 	/** Whether always returns a singleton instance. */
 	private boolean singleton = true;
 	
-	public ExtendedPluginManager(File pluginsRoot, boolean injectable, boolean singleton ) {
+	public ExtendedPluginManager(File pluginsRoot, boolean autowire, boolean singleton ) {
 		super(pluginsRoot.toPath());
-		this.injectable = injectable;
+		this.autowire = autowire;
 		this.singleton = singleton;
 	}
 
-	public ExtendedPluginManager(String pluginsRoot, boolean injectable, boolean singleton ) {
+	public ExtendedPluginManager(String pluginsRoot, boolean autowire, boolean singleton ) {
 		super(Paths.get(pluginsRoot));
-		this.injectable = injectable;
+		this.autowire = autowire;
 		this.singleton = singleton;
 	}
 
-	public ExtendedPluginManager(Path pluginsRoot, boolean injectable, boolean singleton ) {
+	public ExtendedPluginManager(Path pluginsRoot, boolean autowire, boolean singleton ) {
 		super(pluginsRoot);
-		this.injectable = injectable;
+		this.autowire = autowire;
 		this.singleton = singleton;
 	}
 	
 	@Override
 	protected ExtensionFactory createExtensionFactory() {
 
-		if (this.isInjectable()) {
+		if (this.isAutowire()) {
 			if (this.isSingleton()) {
-				return new SingletonSpringExtensionFactory(this);
+				return new SingletonSpringExtensionFactory(this, true);
 			}
-			return new SpringExtensionFactory(this);
+			return new SpringExtensionFactory(this, true);
 
 		} else {
 			if (this.isSingleton()) {
@@ -68,11 +68,11 @@ public class ExtendedPluginManager extends DefaultPluginManager {
 		}
 
 	}
-
-	public boolean isInjectable() {
-		return injectable;
+	
+	public boolean isAutowire() {
+		return autowire;
 	}
-
+	
 	public boolean isSingleton() {
 		return singleton;
 	}

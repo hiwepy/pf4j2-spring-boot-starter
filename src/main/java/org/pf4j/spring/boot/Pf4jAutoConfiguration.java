@@ -25,6 +25,7 @@ import org.pf4j.PluginManager;
 import org.pf4j.PluginStateEvent;
 import org.pf4j.PluginStateListener;
 import org.pf4j.RuntimeMode;
+import org.pf4j.spring.SpringPluginManager;
 import org.pf4j.spring.boot.ext.ExtendedSpringPluginManager;
 import org.pf4j.spring.boot.ext.task.PluginUpdateTask;
 import org.pf4j.spring.boot.ext.update.DefaultUpdateRepositoryProvider;
@@ -52,7 +53,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  * @author <a href="https://github.com/vindell">vindell</a>
  */
 @Configuration
-@ConditionalOnClass({ PluginManager.class })
+@ConditionalOnClass({ PluginManager.class, UpdateManager.class, SpringPluginManager.class })
 @ConditionalOnProperty(prefix = Pf4jProperties.PREFIX, value = "enabled", havingValue = "true")
 @EnableConfigurationProperties(Pf4jProperties.class)
 public class Pf4jAutoConfiguration {
@@ -103,7 +104,8 @@ public class Pf4jAutoConfiguration {
 		// final PluginManager pluginManager = new DefaultPluginManager();
 		// final PluginManager pluginManager = new JarPluginManager();
 		
-		ExtendedSpringPluginManager pluginManager = new ExtendedSpringPluginManager(pluginsRoot, properties.isSingleton());
+		ExtendedSpringPluginManager pluginManager = new ExtendedSpringPluginManager(pluginsRoot,
+				properties.isAutowire(), properties.isSingleton(), properties.isInjectable());
 		
 		/*
 		 * pluginManager.enablePlugin(pluginId) pluginManager.disablePlugin(pluginId)

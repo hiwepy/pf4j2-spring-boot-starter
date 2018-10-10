@@ -31,6 +31,8 @@ public class Pf4jProperties {
 
 	/** Enable Pf4j. */
 	private boolean enabled = false;
+	/** Whether to automatically inject dependent objects */
+	private boolean autowire = true;
 	/** Whether to register the object to the spring context */
 	private boolean injectable = true;
 	/** Whether always returns a singleton instance. */
@@ -68,6 +70,14 @@ public class Pf4jProperties {
 		this.enabled = enabled;
 	}
 	
+	public boolean isAutowire() {
+		return autowire;
+	}
+
+	public void setAutowire(boolean autowire) {
+		this.autowire = autowire;
+	}
+
 	public boolean isInjectable() {
 		return injectable;
 	}

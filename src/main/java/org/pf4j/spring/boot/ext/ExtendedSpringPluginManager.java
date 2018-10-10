@@ -32,31 +32,41 @@ import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFact
  * @author 		： <a href="https://github.com/vindell">vindell</a>
  */
 public class ExtendedSpringPluginManager extends SpringPluginManager {
-
+	
+	/** Whether to automatically inject dependent objects */
+	private boolean autowire = true;
 	/** Whether always returns a singleton instance. */
 	private boolean singleton = true;
+	/** Whether to register the object to the spring context */
+	private boolean injectable = true;
 	
-	public ExtendedSpringPluginManager(File pluginsRoot, boolean singleton ) {
+	public ExtendedSpringPluginManager(File pluginsRoot, boolean autowire, boolean singleton, boolean injectable ) {
 		super(pluginsRoot.toPath());
+		this.autowire = autowire;
 		this.singleton = singleton;
+		this.injectable = injectable;
 	}
 
-	public ExtendedSpringPluginManager(String pluginsRoot, boolean singleton ) {
+	public ExtendedSpringPluginManager(String pluginsRoot, boolean autowire, boolean singleton, boolean injectable ) {
 		super(Paths.get(pluginsRoot));
+		this.autowire = autowire;
 		this.singleton = singleton;
+		this.injectable = injectable;
 	}
 
-	public ExtendedSpringPluginManager(Path pluginsRoot, boolean singleton ) {
+	public ExtendedSpringPluginManager(Path pluginsRoot, boolean autowire, boolean singleton, boolean injectable ) {
 		super(pluginsRoot);
+		this.autowire = autowire;
 		this.singleton = singleton;
+		this.injectable = injectable;
 	}
 
     @Override
     protected ExtensionFactory createExtensionFactory() {
     	if(this.isSingleton()) {
-    		return new SingletonSpringExtensionFactory(this);
+    		return new SingletonSpringExtensionFactory(this, this.isAutowire());
     	}
-        return new SpringExtensionFactory(this);
+        return new SpringExtensionFactory(this, this.isAutowire());
     }
 	
 	/**
@@ -68,13 +78,24 @@ public class ExtendedSpringPluginManager extends SpringPluginManager {
     	loadPlugins();
         startPlugins();
     	
-        AbstractAutowireCapableBeanFactory beanFactory = (AbstractAutowireCapableBeanFactory) getApplicationContext().getAutowireCapableBeanFactory();
-        ExtendedExtensionsInjector extensionsInjector = new ExtendedExtensionsInjector(this, beanFactory);
-        extensionsInjector.injectExtensions();
+        if(this.isInjectable()) {
+        	AbstractAutowireCapableBeanFactory beanFactory = (AbstractAutowireCapableBeanFactory) getApplicationContext().getAutowireCapableBeanFactory();
+            ExtendedExtensionsInjector extensionsInjector = new ExtendedExtensionsInjector(this, beanFactory);
+            extensionsInjector.injectExtensions();
+        }
+        
     }
 
+	public boolean isAutowire() {
+		return autowire;
+	}
+	
 	public boolean isSingleton() {
 		return singleton;
+	}
+
+	public boolean isInjectable() {
+		return injectable;
 	}
     
 }
