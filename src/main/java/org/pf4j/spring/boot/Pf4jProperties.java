@@ -50,10 +50,6 @@ public class Pf4jProperties {
 	private List<String> plugins = new ArrayList<String>();
 	/** Whether the plugin is a JAR package **/
 	private boolean jarPackages = true;
-	/** Whether to delay loading and start the plugin **/
-	private boolean lazy = true;
-	/** The delay of plugin loading and start, default：0 milliseconds **/
-	private long delay = 0;
 
 	/** Whether to automatically update the plugin **/
 	private boolean autoUpdate = false;
@@ -134,22 +130,6 @@ public class Pf4jProperties {
 
 	public void setJarPackages(boolean jarPackages) {
 		this.jarPackages = jarPackages;
-	}
-
-	public boolean isLazy() {
-		return lazy;
-	}
-
-	public void setLazy(boolean lazy) {
-		this.lazy = lazy;
-	}
-
-	public long getDelay() {
-		return delay;
-	}
-
-	public void setDelay(long delay) {
-		this.delay = delay;
 	}
 
 	public boolean isAutoUpdate() {

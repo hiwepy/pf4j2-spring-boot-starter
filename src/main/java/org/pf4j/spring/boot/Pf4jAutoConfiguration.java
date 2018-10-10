@@ -26,9 +26,7 @@ import org.pf4j.PluginStateEvent;
 import org.pf4j.PluginStateListener;
 import org.pf4j.RuntimeMode;
 import org.pf4j.spring.boot.ext.ExtendedSpringPluginManager;
-import org.pf4j.spring.boot.ext.task.PluginLazyTask;
 import org.pf4j.spring.boot.ext.task.PluginUpdateTask;
-import org.pf4j.spring.boot.ext.task.PluginsLazyTask;
 import org.pf4j.spring.boot.ext.update.DefaultUpdateRepositoryProvider;
 import org.pf4j.spring.boot.ext.update.UpdateRepositoryProvider;
 import org.pf4j.spring.boot.ext.utils.PluginUtils;
@@ -37,11 +35,10 @@ import org.pf4j.update.UpdateManager;
 import org.pf4j.update.UpdateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,7 +52,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  * @author <a href="https://github.com/vindell">vindell</a>
  */
 @Configuration
-@AutoConfigureAfter({WebMvcAutoConfiguration.class})
 @ConditionalOnClass({ PluginManager.class })
 @ConditionalOnProperty(prefix = Pf4jProperties.PREFIX, value = "enabled", havingValue = "true")
 @EnableConfigurationProperties(Pf4jProperties.class)
@@ -88,6 +84,7 @@ public class Pf4jAutoConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnBean(RequestMappingHandlerMapping.class)
 	public PluginManager pluginManager(RequestMappingHandlerMapping requestMappingHandlerMapping, Pf4jProperties properties) {
 
 		// 设置运行模式
@@ -116,23 +113,8 @@ public class Pf4jAutoConfiguration {
 		 * pluginManager.stopPlugin(pluginId) pluginManager.unloadPlugin(pluginId)
 		 */
 
-		if (properties.isLazy()) {
-			// 延时加载、启动插件目录中的插件
-			timer.schedule(new PluginLazyTask(pluginManager), properties.getDelay());
-			// 延时加载、启动绝对路径指定的插件
-			timer.schedule(new PluginsLazyTask(pluginManager, properties.getPlugins()), properties.getDelay());
-		} else {
-
-			// 加载、启动插件目录中的插件
-			pluginManager.loadPlugins();
-			/*
-			 * 调用Plugin实现类的start()方法:
-			 */
-			pluginManager.startPlugins();
-
-			// 加载、启动绝对路径指定的插件
-			PluginUtils.loadAndStartPlugins(pluginManager, properties.getPlugins());
-		}
+		// 加载、启动绝对路径指定的插件
+		PluginUtils.loadAndStartPlugins(pluginManager, properties.getPlugins());
 
 		/**
 		 * 应用退出时，要调用shutdown来清理资源，关闭网络连接 注意：我们建议应用在JBOSS、Tomcat等容器的退出钩子里调用shutdown方法
