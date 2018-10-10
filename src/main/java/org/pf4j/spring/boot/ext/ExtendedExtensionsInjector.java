@@ -78,6 +78,10 @@ public class ExtendedExtensionsInjector extends ExtensionsInjector {
 	protected void registerExtension(Class<?> extensionClass) {
        
 		Object extension = pluginManager.getExtensionFactory().create(extensionClass);
+
+		if(!InjectorUtils.isInjectNecessary(extension)) {
+			return;
+		}
 		
 		String beanName = InjectorUtils.getBeanName(extension, extension.getClass().getName());
 		// 判断对象是否是Controller

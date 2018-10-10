@@ -15,7 +15,6 @@
  */
 package org.pf4j.spring.boot.ext.utils;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
@@ -30,38 +29,79 @@ import org.springframework.web.bind.annotation.RestController;
 public class InjectorUtils {
 
 	public static boolean isController(Object bean) {
-		return !ArrayUtils.isEmpty(bean.getClass().getAnnotationsByType(RestController.class))
-				|| !ArrayUtils.isEmpty(bean.getClass().getAnnotationsByType(Controller.class));
-	}
-	
-	public static String getBeanName(Object bean, String defaultName) {
-		
+
 		RestController restController = bean.getClass().getAnnotation(RestController.class);
-		if(restController !=null  && StringUtils.hasText(restController.value())) {
+		if (restController != null) {
+			return true;
+		}
+
+		Controller controller = bean.getClass().getAnnotation(Controller.class);
+		if (controller != null) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public static boolean isInjectNecessary(Object bean) {
+
+		RestController restController = bean.getClass().getAnnotation(RestController.class);
+		if (restController != null) {
+			return true;
+		}
+
+		Controller controller = bean.getClass().getAnnotation(Controller.class);
+		if (controller != null) {
+			return true;
+		}
+
+		Component component = bean.getClass().getAnnotation(Component.class);
+		if (component != null && StringUtils.hasText(component.value())) {
+			return true;
+		}
+
+		Service service = bean.getClass().getAnnotation(Service.class);
+		if (service != null) {
+			return true;
+		}
+
+		Repository repository = bean.getClass().getAnnotation(Repository.class);
+		if (repository != null && StringUtils.hasText(repository.value())) {
+			return true;
+		}
+
+		return false;
+
+	}
+
+	public static String getBeanName(Object bean, String defaultName) {
+
+		RestController restController = bean.getClass().getAnnotation(RestController.class);
+		if (restController != null && StringUtils.hasText(restController.value())) {
 			return restController.value();
 		}
-		
+
 		Controller controller = bean.getClass().getAnnotation(Controller.class);
-		if(controller !=null && StringUtils.hasText(controller.value())) {
+		if (controller != null && StringUtils.hasText(controller.value())) {
 			return controller.value();
 		}
-		
+
 		Component component = bean.getClass().getAnnotation(Component.class);
-		if(component !=null && StringUtils.hasText(component.value())) {
+		if (component != null && StringUtils.hasText(component.value())) {
 			return component.value();
 		}
-		
+
 		Service service = bean.getClass().getAnnotation(Service.class);
-		if(service !=null && StringUtils.hasText(service.value())) {
+		if (service != null) {
 			return service.value();
 		}
-		
+
 		Repository repository = bean.getClass().getAnnotation(Repository.class);
-		if(repository !=null && StringUtils.hasText(repository.value())) {
+		if (repository != null && StringUtils.hasText(repository.value())) {
 			return repository.value();
 		}
-		
+
 		return defaultName;
 	}
-	
+
 }
