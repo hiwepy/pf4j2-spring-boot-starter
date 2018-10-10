@@ -31,6 +31,10 @@ public class Pf4jProperties {
 
 	/** Enable Pf4j. */
 	private boolean enabled = false;
+	/** Whether to register the object to the spring context */
+	private boolean injectable = true;
+	/** Whether always returns a singleton instance. */
+	private boolean singleton = true;
 	/** Extended Plugin Class Directory **/
 	private List<String> classesDirectories = new ArrayList<String>();
 	/** Extended Plugin Jar Directory **/
@@ -66,6 +70,22 @@ public class Pf4jProperties {
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+	
+	public boolean isInjectable() {
+		return injectable;
+	}
+
+	public void setInjectable(boolean injectable) {
+		this.injectable = injectable;
+	}
+
+	public boolean isSingleton() {
+		return singleton;
+	}
+
+	public void setSingleton(boolean singleton) {
+		this.singleton = singleton;
 	}
 
 	public List<String> getClassesDirectories() {

@@ -19,20 +19,62 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.pf4j.DefaultExtensionFactory;
 import org.pf4j.DefaultPluginManager;
+import org.pf4j.ExtensionFactory;
+import org.pf4j.SingletonExtensionFactory;
+import org.pf4j.spring.SingletonSpringExtensionFactory;
+import org.pf4j.spring.SpringExtensionFactory;
 
 public class ExtendedPluginManager extends DefaultPluginManager {
 
-	public ExtendedPluginManager(File pluginsRoot) {
+	/** Whether to register the object to the spring context */
+	private boolean injectable = true;
+	/** Whether always returns a singleton instance. */
+	private boolean singleton = true;
+	
+	public ExtendedPluginManager(File pluginsRoot, boolean injectable, boolean singleton ) {
 		super(pluginsRoot.toPath());
+		this.injectable = injectable;
+		this.singleton = singleton;
 	}
 
-	public ExtendedPluginManager(String pluginsRoot) {
+	public ExtendedPluginManager(String pluginsRoot, boolean injectable, boolean singleton ) {
 		super(Paths.get(pluginsRoot));
+		this.injectable = injectable;
+		this.singleton = singleton;
 	}
 
-	public ExtendedPluginManager(Path pluginsRoot) {
+	public ExtendedPluginManager(Path pluginsRoot, boolean injectable, boolean singleton ) {
 		super(pluginsRoot);
+		this.injectable = injectable;
+		this.singleton = singleton;
+	}
+	
+	@Override
+	protected ExtensionFactory createExtensionFactory() {
+
+		if (this.isInjectable()) {
+			if (this.isSingleton()) {
+				return new SingletonSpringExtensionFactory(this);
+			}
+			return new SpringExtensionFactory(this);
+
+		} else {
+			if (this.isSingleton()) {
+				return new SingletonExtensionFactory();
+			}
+			return new DefaultExtensionFactory();
+		}
+
+	}
+
+	public boolean isInjectable() {
+		return injectable;
+	}
+
+	public boolean isSingleton() {
+		return singleton;
 	}
 
 }

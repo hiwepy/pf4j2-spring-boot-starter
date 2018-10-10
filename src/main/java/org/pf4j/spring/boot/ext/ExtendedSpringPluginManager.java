@@ -21,9 +21,11 @@ import java.nio.file.Paths;
 
 import javax.annotation.PostConstruct;
 
+import org.pf4j.ExtensionFactory;
+import org.pf4j.spring.SingletonSpringExtensionFactory;
+import org.pf4j.spring.SpringExtensionFactory;
 import org.pf4j.spring.SpringPluginManager;
 import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
  * TODO
@@ -31,24 +33,31 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  */
 public class ExtendedSpringPluginManager extends SpringPluginManager {
 
-	private final RequestMappingHandlerMapping requestMappingHandlerMapping;
-
-	public ExtendedSpringPluginManager(File pluginsRoot, RequestMappingHandlerMapping requestMappingHandlerMapping) {
+	/** Whether always returns a singleton instance. */
+	private boolean singleton = true;
+	
+	public ExtendedSpringPluginManager(File pluginsRoot, boolean singleton ) {
 		super(pluginsRoot.toPath());
-		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
+		this.singleton = singleton;
 	}
 
-
-	public ExtendedSpringPluginManager(String pluginsRoot, RequestMappingHandlerMapping requestMappingHandlerMapping) {
+	public ExtendedSpringPluginManager(String pluginsRoot, boolean singleton ) {
 		super(Paths.get(pluginsRoot));
-		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
+		this.singleton = singleton;
 	}
 
-
-	public ExtendedSpringPluginManager(Path pluginsRoot, RequestMappingHandlerMapping requestMappingHandlerMapping) {
+	public ExtendedSpringPluginManager(Path pluginsRoot, boolean singleton ) {
 		super(pluginsRoot);
-		this.requestMappingHandlerMapping = requestMappingHandlerMapping;
+		this.singleton = singleton;
 	}
+
+    @Override
+    protected ExtensionFactory createExtensionFactory() {
+    	if(this.isSingleton()) {
+    		return new SingletonSpringExtensionFactory(this);
+    	}
+        return new SpringExtensionFactory(this);
+    }
 	
 	/**
      * This method load, start plugins and inject controller extensions in Spring
@@ -63,5 +72,9 @@ public class ExtendedSpringPluginManager extends SpringPluginManager {
         ExtendedExtensionsInjector extensionsInjector = new ExtendedExtensionsInjector(this, beanFactory);
         extensionsInjector.injectExtensions();
     }
-	
+
+	public boolean isSingleton() {
+		return singleton;
+	}
+    
 }
