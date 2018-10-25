@@ -86,7 +86,7 @@ public class Pf4jAutoConfiguration {
 
 	@Bean
 	@ConditionalOnBean(RequestMappingHandlerMapping.class)
-	public PluginManager pluginManager(RequestMappingHandlerMapping requestMappingHandlerMapping, Pf4jProperties properties) {
+	public PluginManager pluginManager(Pf4jProperties properties) {
 
 		// 设置运行模式
 		RuntimeMode mode = RuntimeMode.byName(properties.getMode());
