@@ -27,6 +27,7 @@ import org.pf4j.PluginStateListener;
 import org.pf4j.RuntimeMode;
 import org.pf4j.spring.SpringPluginManager;
 import org.pf4j.spring.boot.ext.ExtendedSpringPluginManager;
+import org.pf4j.spring.boot.ext.registry.Pf4jDynamicControllerRegistry;
 import org.pf4j.spring.boot.ext.task.PluginUpdateTask;
 import org.pf4j.spring.boot.ext.update.DefaultUpdateRepositoryProvider;
 import org.pf4j.spring.boot.ext.update.UpdateRepositoryProvider;
@@ -36,7 +37,6 @@ import org.pf4j.update.UpdateManager;
 import org.pf4j.update.UpdateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -45,7 +45,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
  * Pf4j 2.x Configuration
@@ -62,6 +61,12 @@ public class Pf4jAutoConfiguration {
 	// 实例化Timer类
 	private Timer timer = new Timer(true);
 
+	@Bean
+	@ConditionalOnMissingBean(Pf4jDynamicControllerRegistry.class)
+	public Pf4jDynamicControllerRegistry pf4jDynamicControllerRegistry() {
+		return new Pf4jDynamicControllerRegistry();
+	}
+	
 	@Bean
 	@ConditionalOnMissingBean(PluginStateListener.class)
 	public PluginStateListener pluginStateListener() {
@@ -85,7 +90,6 @@ public class Pf4jAutoConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnBean(RequestMappingHandlerMapping.class)
 	public PluginManager pluginManager(Pf4jProperties properties) {
 
 		// 设置运行模式

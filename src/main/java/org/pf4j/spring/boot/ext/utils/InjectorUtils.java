@@ -28,14 +28,14 @@ import org.springframework.web.bind.annotation.RestController;
  */
 public class InjectorUtils {
 
-	public static boolean isController(Object bean) {
+	public static boolean isController(Class<?> extensionClass) {
 
-		RestController restController = bean.getClass().getAnnotation(RestController.class);
+		RestController restController = extensionClass.getAnnotation(RestController.class);
 		if (restController != null) {
 			return true;
 		}
 
-		Controller controller = bean.getClass().getAnnotation(Controller.class);
+		Controller controller = extensionClass.getAnnotation(Controller.class);
 		if (controller != null) {
 			return true;
 		}
@@ -43,29 +43,29 @@ public class InjectorUtils {
 		return false;
 	}
 
-	public static boolean isInjectNecessary(Object bean) {
+	public static boolean isInjectNecessary(Class<?> extensionClass) {
 
-		RestController restController = bean.getClass().getAnnotation(RestController.class);
+		RestController restController = extensionClass.getAnnotation(RestController.class);
 		if (restController != null) {
 			return true;
 		}
 
-		Controller controller = bean.getClass().getAnnotation(Controller.class);
+		Controller controller = extensionClass.getAnnotation(Controller.class);
 		if (controller != null) {
 			return true;
 		}
 
-		Component component = bean.getClass().getAnnotation(Component.class);
+		Component component = extensionClass.getAnnotation(Component.class);
 		if (component != null && StringUtils.hasText(component.value())) {
 			return true;
 		}
 
-		Service service = bean.getClass().getAnnotation(Service.class);
+		Service service = extensionClass.getAnnotation(Service.class);
 		if (service != null) {
 			return true;
 		}
 
-		Repository repository = bean.getClass().getAnnotation(Repository.class);
+		Repository repository = extensionClass.getAnnotation(Repository.class);
 		if (repository != null && StringUtils.hasText(repository.value())) {
 			return true;
 		}
@@ -74,29 +74,29 @@ public class InjectorUtils {
 
 	}
 
-	public static String getBeanName(Object bean, String defaultName) {
+	public static String getBeanName(Class<?> extensionClass, String defaultName) {
 
-		RestController restController = bean.getClass().getAnnotation(RestController.class);
+		RestController restController = extensionClass.getAnnotation(RestController.class);
 		if (restController != null && StringUtils.hasText(restController.value())) {
 			return restController.value();
 		}
 
-		Controller controller = bean.getClass().getAnnotation(Controller.class);
+		Controller controller = extensionClass.getAnnotation(Controller.class);
 		if (controller != null && StringUtils.hasText(controller.value())) {
 			return controller.value();
 		}
 
-		Component component = bean.getClass().getAnnotation(Component.class);
+		Component component = extensionClass.getAnnotation(Component.class);
 		if (component != null && StringUtils.hasText(component.value())) {
 			return component.value();
 		}
 
-		Service service = bean.getClass().getAnnotation(Service.class);
+		Service service = extensionClass.getAnnotation(Service.class);
 		if (service != null) {
 			return service.value();
 		}
 
-		Repository repository = bean.getClass().getAnnotation(Repository.class);
+		Repository repository = extensionClass.getAnnotation(Repository.class);
 		if (repository != null && StringUtils.hasText(repository.value())) {
 			return repository.value();
 		}

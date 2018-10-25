@@ -25,7 +25,8 @@ import org.pf4j.ExtensionFactory;
 import org.pf4j.spring.SingletonSpringExtensionFactory;
 import org.pf4j.spring.SpringExtensionFactory;
 import org.pf4j.spring.SpringPluginManager;
-import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
+import org.pf4j.spring.boot.ext.registry.Pf4jDynamicControllerRegistry;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * TODO
@@ -68,21 +69,24 @@ public class ExtendedSpringPluginManager extends SpringPluginManager {
     	}
         return new SpringExtensionFactory(this, this.isAutowire());
     }
-	
+    
+    @Autowired
+    private Pf4jDynamicControllerRegistry dynamicControllerRegistry;
+    
 	/**
      * This method load, start plugins and inject controller extensions in Spring
      */
     @PostConstruct
     public void init() {
-    	
-    	loadPlugins();
-        startPlugins();
-    	
-        if(this.isInjectable()) {
-        	AbstractAutowireCapableBeanFactory beanFactory = (AbstractAutowireCapableBeanFactory) getApplicationContext().getAutowireCapableBeanFactory();
-            ExtendedExtensionsInjector extensionsInjector = new ExtendedExtensionsInjector(this, beanFactory);
-            extensionsInjector.injectExtensions();
-        }
+
+		loadPlugins();
+		startPlugins();
+
+		if (this.isInjectable()) {
+			ExtendedExtensionsInjector extensionsInjector = new ExtendedExtensionsInjector(this,
+					dynamicControllerRegistry, getApplicationContext());
+			extensionsInjector.injectExtensions();
+		}
         
     }
 
