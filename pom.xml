@@ -371,11 +371,11 @@
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <maven-surefire-plugin.vertsion>2.22.1</maven-surefire-plugin.vertsion>
 		<maven-nexus-staging-plugin.version>1.6.8</maven-nexus-staging-plugin.version>
-		<pf4j.version>2.4.0</pf4j.version>
+		<pf4j.version>2.6.0</pf4j.version>
 		<pf4j-update.version>2.0.0</pf4j-update.version>
 		<pf4j-spring.version>0.5.0</pf4j-spring.version>
 		<slf4j.version>1.7.26</slf4j.version>
-		<spring-cloud-deployer.version>2.0.1.RELEASE</spring-cloud-deployer.version>
+		<spring-boot-starter-maven-client.version>1.0.0-SNAPSHOT</spring-boot-starter-maven-client.version>
 	</properties>
 
 	<repositories>
@@ -480,12 +480,12 @@
 		    <artifactId>pf4j-update</artifactId>
 		    <version>${pf4j-update.version}</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-deployer-resource-maven -->
+		
 		<dependency>
-		    <groupId>org.springframework.cloud</groupId>
-		    <artifactId>spring-cloud-deployer-resource-maven</artifactId>
-		    <version>${spring-cloud-deployer.version}</version>
-		    <scope>provided</scope>
+			<groupId>com.github.vindell</groupId>
+			<artifactId>spring-boot-starter-maven-client</artifactId>
+			<version>${spring-boot-starter-maven-client.version}</version>
+			<optional>true</optional>
 		</dependency>
 				
 	</dependencies>
