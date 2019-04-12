@@ -1,4 +1,2 @@
-pf4j:
-  update:
-    repositories:
-    - 
+spring:
+  pf4j:    jar-packages: true

@@ -54,7 +54,7 @@ import org.springframework.util.StringUtils;
 @Configuration
 @ConditionalOnClass({ PluginManager.class, UpdateManager.class, SpringPluginManager.class })
 @ConditionalOnProperty(prefix = Pf4jProperties.PREFIX, value = "enabled", havingValue = "true")
-@EnableConfigurationProperties(Pf4jProperties.class)
+@EnableConfigurationProperties({Pf4jProperties.class, Pf4jUpdateMavenProperties.class})
 public class Pf4jAutoConfiguration {
 
 	private Logger logger = LoggerFactory.getLogger(Pf4jAutoConfiguration.class);
