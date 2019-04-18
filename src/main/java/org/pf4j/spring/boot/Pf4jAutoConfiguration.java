@@ -20,7 +20,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Timer;
 
-import org.apache.maven.spring.boot.ext.MavenClientTemplate;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginManager;
 import org.pf4j.PluginStateEvent;
@@ -30,7 +29,6 @@ import org.pf4j.spring.SpringPluginManager;
 import org.pf4j.spring.boot.ext.ExtendedSpringPluginManager;
 import org.pf4j.spring.boot.ext.registry.Pf4jDynamicControllerRegistry;
 import org.pf4j.spring.boot.ext.task.PluginUpdateTask;
-import org.pf4j.spring.boot.ext.update.MavenUpdateRepository;
 import org.pf4j.spring.boot.ext.utils.PluginUtils;
 import org.pf4j.spring.boot.hooks.Pf4jShutdownHook;
 import org.pf4j.update.DefaultUpdateRepository;
@@ -130,11 +128,6 @@ public class Pf4jAutoConfiguration {
 		Runtime.getRuntime().addShutdownHook(new Pf4jShutdownHook(pluginManager));
 
 		return pluginManager;
-	}
-	
-	@Bean
-	public MavenUpdateRepository mavenUpdateRepository(MavenClientTemplate mavenClientTemplate, PluginManager pluginManager) {
-		return new MavenUpdateRepository("maven", mavenClientTemplate, pluginManager);
 	}
 	
 	@Bean
