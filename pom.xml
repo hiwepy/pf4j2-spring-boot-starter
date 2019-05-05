@@ -375,7 +375,7 @@
 		<pf4j-update.version>2.0.0</pf4j-update.version>
 		<pf4j-spring.version>0.5.0</pf4j-spring.version>
 		<slf4j.version>1.7.26</slf4j.version>
-		<spring-boot-starter-maven-client.version>1.0.1-SNAPSHOT</spring-boot-starter-maven-client.version>
+		<spring-boot-starter-maven-client.version>1.0.0-SNAPSHOT</spring-boot-starter-maven-client.version>
 	</properties>
 
 	<repositories>
