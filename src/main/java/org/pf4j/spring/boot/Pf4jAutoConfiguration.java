@@ -48,6 +48,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import com.google.common.collect.Lists;
+
 /**
  * Pf4j 2.x Configuration
  * 
@@ -145,17 +147,21 @@ public class Pf4jAutoConfiguration {
 			updateManager = new UpdateManager(pluginManager);
 		}
 		
+		List<UpdateRepository> repositories = Lists.newArrayList();
 		if(!CollectionUtils.isEmpty(properties.getRepos())) {
 			for (Pf4jUpdateProperties repo : properties.getRepos()) {
-				updateManager.addRepository(new DefaultUpdateRepository(repo.getId(), repo.getUrl(), repo.getPluginsJsonFileName()));
+				repositories.add(new DefaultUpdateRepository(repo.getId(), repo.getUrl(), repo.getPluginsJsonFileName()));
 			}
 		}
 		List<UpdateRepository> repos = repoProvider.orderedStream().collect(Collectors.toList());
 		if(!CollectionUtils.isEmpty(repos)) {
 			for (UpdateRepository newRepo : repos) {
-				updateManager.addRepository(newRepo);
+				if (newRepo != null) {
+					repositories.add(newRepo);
+				}
 			}
 		}
+		updateManager.setRepositories(repositories);
 		// auto update
 		if(properties.isAutoUpdate()) {
 			timer.schedule(new PluginUpdateTask(pluginManager, updateManager), properties.getPeriod());

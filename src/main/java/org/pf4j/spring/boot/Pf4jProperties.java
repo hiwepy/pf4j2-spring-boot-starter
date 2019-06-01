@@ -57,8 +57,8 @@ public class Pf4jProperties {
 	private boolean autoUpdate = false;
 	/** The period of plugin automatic update check, default：5000 milliseconds **/
 	private long period = 5000;
-	/** Local Repos Path **/
-	protected String reposJsonPath = "repositories.json";
+	/** Local Repos Path , i.e : repositories.json**/
+	protected String reposJsonPath;
 	/** Remote Repos Path **/
 	protected List<Pf4jUpdateProperties> repos = new ArrayList<Pf4jUpdateProperties>();
 
