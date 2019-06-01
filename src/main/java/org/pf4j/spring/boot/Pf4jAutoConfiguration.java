@@ -140,13 +140,6 @@ public class Pf4jAutoConfiguration {
 			@Autowired(required = false) ObjectProvider<UpdateRepository> repoProvider,
 			Pf4jProperties properties) {
 		
-		UpdateManager updateManager = null;
-		if (StringUtils.hasText(properties.getReposJsonPath())) {
-			updateManager = new UpdateManager(pluginManager, Paths.get(properties.getReposJsonPath()));
-		} else {
-			updateManager = new UpdateManager(pluginManager);
-		}
-		
 		List<UpdateRepository> repositories = Lists.newArrayList();
 		if(!CollectionUtils.isEmpty(properties.getRepos())) {
 			for (Pf4jUpdateProperties repo : properties.getRepos()) {
@@ -161,7 +154,19 @@ public class Pf4jAutoConfiguration {
 				}
 			}
 		}
-		updateManager.setRepositories(repositories);
+		
+		UpdateManager updateManager = null;
+		if (StringUtils.hasText(properties.getReposJsonPath())) {
+			updateManager = new UpdateManager(pluginManager, Paths.get(properties.getReposJsonPath()));
+			if(!CollectionUtils.isEmpty(repositories)) {
+				updateManager.setRepositories(repositories);
+			}
+		} else if(!CollectionUtils.isEmpty(repositories)) {
+			updateManager = new UpdateManager(pluginManager, repositories);
+		} else {
+			updateManager = new UpdateManager(pluginManager);
+		}
+		
 		// auto update
 		if(properties.isAutoUpdate()) {
 			timer.schedule(new PluginUpdateTask(pluginManager, updateManager), properties.getPeriod());
