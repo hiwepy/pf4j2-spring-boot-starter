@@ -54,7 +54,12 @@ public class MavenUpdateRepository implements UpdateRepository {
 	@Override
     public Map<String, PluginInfo> getPlugins() {
         if (plugins == null) {
-        	plugins = getPluginInfoProvider().plugins();;
+        	plugins = getPluginInfoProvider().plugins();
+        	if(plugins != null) {
+        		plugins.entrySet().forEach(info -> {
+            		info.getValue().setRepositoryId(MAVEN_REPOSITORY);
+            	});
+        	}
         }
         return plugins;
     }
