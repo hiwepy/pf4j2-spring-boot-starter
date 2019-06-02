@@ -15,27 +15,13 @@
  */
 package org.pf4j.spring.boot.ext.update;
 
-import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.spring.boot.ext.MavenClientTemplate;
-import org.eclipse.aether.metadata.DefaultMetadata;
-import org.eclipse.aether.metadata.Metadata;
-import org.eclipse.aether.resolution.MetadataResult;
-import org.pf4j.PluginDescriptor;
-import org.pf4j.PluginManager;
-import org.pf4j.PluginWrapper;
-import org.pf4j.update.DefaultUpdateRepository;
 import org.pf4j.update.FileDownloader;
 import org.pf4j.update.PluginInfo;
-import org.pf4j.update.PluginInfo.PluginRelease;
 import org.pf4j.update.UpdateRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.cloud.deployer.resource.maven.MavenResource;
+import org.springframework.cloud.deployer.resource.maven.MavenProperties;
 
 /**
  * TODO
@@ -43,27 +29,21 @@ import org.springframework.cloud.deployer.resource.maven.MavenResource;
  */
 public class MavenUpdateRepository implements UpdateRepository {
 	
-    private static final Logger logger = LoggerFactory.getLogger(DefaultUpdateRepository.class);
-    private String id;
+    private static final String MAVEN_REPOSITORY = "maven";
+    
     private URL url;
     private Map<String, PluginInfo> plugins;
-	private PluginManager pluginManager;
-	private MavenClientTemplate mavenClientTemplate;
+    private MavenProperties mavenProperties;
+	private PluginInfoProvider pluginInfoProvider;
 	
-	public MavenUpdateRepository(String id, MavenClientTemplate mavenClientTemplate, PluginManager pluginManager) {
-		this.id = id;
-		this.mavenClientTemplate = mavenClientTemplate;
-		this.pluginManager = pluginManager;
-	}
-	
-	public MavenUpdateRepository(String id, URL url, MavenClientTemplate mavenClientTemplate, PluginManager pluginManager) {
-		this(id, mavenClientTemplate, pluginManager);
-		this.url = url;
+	public MavenUpdateRepository(MavenProperties mavenProperties,PluginInfoProvider pluginInfoProvider) {
+		this.mavenProperties = mavenProperties;
+		this.pluginInfoProvider = pluginInfoProvider;
 	}
 	
 	@Override
     public String getId() {
-        return id;
+        return MAVEN_REPOSITORY;
     }
 
 	@Override
@@ -74,84 +54,14 @@ public class MavenUpdateRepository implements UpdateRepository {
 	@Override
     public Map<String, PluginInfo> getPlugins() {
         if (plugins == null) {
-            initPlugins();
+        	plugins = getPluginInfoProvider().plugins();;
         }
-        //MavenResource.parse(coordinates, properties).getFile();
         return plugins;
     }
 	
     @Override
     public PluginInfo getPlugin(String coordinates) {
         return getPlugins().get(coordinates);
-    }
-
-    private void initPlugins() {
-    	
-    	// Maven仓库的更新仅支持本地已有插件的更新，不支持没有的插件
-		for (PluginWrapper installed : pluginManager.getPlugins()) {
-			
-			PluginInfo info = new PluginInfo();
-			
-			PluginDescriptor descriptor = installed.getDescriptor();
-			info.id = installed.getPluginId();
-			info.description = descriptor.getPluginDescription(); 
-			info.provider = descriptor.getProvider();
-			info.setRepositoryId(getId());
-			
-			// 解析Maven版本信息
-			List<MetadataResult> metadatas = mavenClientTemplate.metadata(installed.getPluginId());
-			/*
-			<?xml version="1.0" encoding="UTF-8"?>
-			<metadata modelVersion="1.1.0">
-			  <groupId>com.oracle</groupId>
-			  <artifactId>ojdbc6dms</artifactId>
-			  <versioning>
-			    <latest>12.1.0.2</latest>
-			    <release>12.1.0.2</release>
-			    <versions>
-			      <version>11.1.0.7.0</version>
-			      <version>11.2.0.1.0</version>
-			      <version>11.2.0.2.0</version>
-			      <version>11.2.0.3</version>
-			      <version>11.2.0.4</version>
-			      <version>12.1.0.2</version>
-			    </versions>
-			    <lastUpdated>20181220183842</lastUpdated>
-			  </versioning>
-			</metadata>
-			*/
-			List<PluginInfo.PluginRelease> releases = new ArrayList<PluginInfo.PluginRelease>();
-			metadatas.forEach(action -> {
-				
-				if (action.isResolved() && action.isUpdated()) {
-					
-					Metadata metadata = action.getMetadata();
-					if(metadata instanceof DefaultMetadata) {
-						
-					}
-					
-					PluginRelease release = new PluginInfo.PluginRelease(); 
-					
-					release.version = metadata.getVersion();
-					try {
-						release.url = new MavenResource.Builder().groupId(metadata.getGroupId()).artifactId(metadata.getArtifactId())
-								.version(metadata.getVersion()).build().getURI().toString();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					
-					String.format("%s:%s:%s", metadata.getGroupId(), metadata.getArtifactId(), metadata.getVersion()) ;
-					metadata.getProperties();
-					
-				}
-				
-			});
-			info.releases = releases;
-			
-			plugins.put(installed.getPluginId(), info);
-		}
-     
-		logger.debug("Found {} plugins in repository '{}'", plugins.size(), id);
     }
 
     /**
@@ -164,7 +74,11 @@ public class MavenUpdateRepository implements UpdateRepository {
 
     @Override
     public FileDownloader getFileDownloader() {
-        return new MavenFileDownloader(mavenClientTemplate);
+        return new MavenFileDownloader(mavenProperties);
     }
+
+	public PluginInfoProvider getPluginInfoProvider() {
+		return pluginInfoProvider;
+	}
 
 }

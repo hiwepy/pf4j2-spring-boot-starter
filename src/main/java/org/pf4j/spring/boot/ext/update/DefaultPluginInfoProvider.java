@@ -13,18 +13,22 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.pf4j.spring.boot;
+package org.pf4j.spring.boot.ext.update;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.deployer.resource.maven.MavenProperties;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.pf4j.update.PluginInfo;
 
 /**
- * Maven Settings
- * @author ： <a href="https://github.com/vindell">vindell</a>
+ * TODO
+ * @author 		： <a href="https://github.com/vindell">vindell</a>
  */
-@ConfigurationProperties(Pf4jUpdateMavenProperties.PREFIX)
-public class Pf4jUpdateMavenProperties extends MavenProperties {
+public class DefaultPluginInfoProvider implements PluginInfoProvider {
 
-	public static final String PREFIX = "maven.settings";
+	@Override
+	public Map<String, PluginInfo> plugins() {
+		return new HashMap<String, PluginInfo>();
+	}
 
 }

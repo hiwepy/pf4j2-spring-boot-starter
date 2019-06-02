@@ -60,17 +60,8 @@ public class Pf4jProperties {
 	private boolean jarPackages = true;
 	/* The system version used for comparisons to the plugin requires attribute. */
 	private String systemVersion = "0.0.0";
-	/** Whether to automatically update the plugin **/
-	private boolean autoUpdate = false;
-	/** The delay of plugin automatic update check, default：10000 milliseconds **/
-	private long delay = 10000;
-	/** The period of plugin automatic update check, default：10 seconds **/
-	private long period = 1000 * 60 * 10;
-	/** Local Repos Path , i.e : repositories.json **/
-	protected String reposJsonPath;
-	/** Remote Repos Path **/
-	protected List<Pf4jUpdateProperties> repos = new ArrayList<Pf4jUpdateProperties>();
-
+	
+	
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -172,46 +163,6 @@ public class Pf4jProperties {
 
 	public boolean isExactVersionAllowed() {
 		return exactVersionAllowed;
-	}
-
-	public boolean isAutoUpdate() {
-		return autoUpdate;
-	}
-
-	public void setAutoUpdate(boolean autoUpdate) {
-		this.autoUpdate = autoUpdate;
-	}
-
-	public long getDelay() {
-		return delay;
-	}
-
-	public void setDelay(long delay) {
-		this.delay = delay;
-	}
-
-	public long getPeriod() {
-		return period;
-	}
-
-	public void setPeriod(long period) {
-		this.period = period;
-	}
-
-	public String getReposJsonPath() {
-		return reposJsonPath;
-	}
-
-	public void setReposJsonPath(String reposJsonPath) {
-		this.reposJsonPath = reposJsonPath;
-	}
-
-	public List<Pf4jUpdateProperties> getRepos() {
-		return repos;
-	}
-
-	public void setRepos(List<Pf4jUpdateProperties> repos) {
-		this.repos = repos;
 	}
 
 }

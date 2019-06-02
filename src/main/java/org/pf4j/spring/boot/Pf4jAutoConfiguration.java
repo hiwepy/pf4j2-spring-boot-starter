@@ -16,10 +16,6 @@
 package org.pf4j.spring.boot;
 
 import java.io.File;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Timer;
-import java.util.stream.Collectors;
 
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginManager;
@@ -28,31 +24,23 @@ import org.pf4j.PluginStateListener;
 import org.pf4j.RuntimeMode;
 import org.pf4j.spring.SpringPluginManager;
 import org.pf4j.spring.boot.ext.ExtendedSpringPluginManager;
+import org.pf4j.spring.boot.ext.property.Pf4jUpdateMavenProperties;
 import org.pf4j.spring.boot.ext.registry.Pf4jDynamicControllerRegistry;
-import org.pf4j.spring.boot.ext.task.PluginUpdateTask;
 import org.pf4j.spring.boot.ext.utils.PluginUtils;
 import org.pf4j.spring.boot.hooks.Pf4jShutdownHook;
-import org.pf4j.update.DefaultUpdateRepository;
 import org.pf4j.update.UpdateManager;
-import org.pf4j.update.UpdateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
-import com.google.common.collect.Lists;
 
 /**
  * Pf4j 2.x Configuration
- * 
  * @author <a href="https://github.com/vindell">vindell</a>
  */
 @Configuration
@@ -62,8 +50,6 @@ import com.google.common.collect.Lists;
 public class Pf4jAutoConfiguration {
 
 	private Logger logger = LoggerFactory.getLogger(Pf4jAutoConfiguration.class);
-	// 实例化Timer类
-	private Timer timer = new Timer(true);
 
 	@Bean
 	@ConditionalOnMissingBean(Pf4jDynamicControllerRegistry.class)
@@ -141,46 +127,6 @@ public class Pf4jAutoConfiguration {
 		Runtime.getRuntime().addShutdownHook(new Pf4jShutdownHook(pluginManager));
 
 		return pluginManager;
-	}
-	
-	@Bean
-	public UpdateManager updateManager(
-			PluginManager pluginManager,
-			@Autowired(required = false) ObjectProvider<UpdateRepository> repoProvider,
-			Pf4jProperties properties) {
-		
-		List<UpdateRepository> repositories = Lists.newArrayList();
-		if(!CollectionUtils.isEmpty(properties.getRepos())) {
-			for (Pf4jUpdateProperties repo : properties.getRepos()) {
-				repositories.add(new DefaultUpdateRepository(repo.getId(), repo.getUrl(), repo.getPluginsJsonFileName()));
-			}
-		}
-		List<UpdateRepository> repos = repoProvider.orderedStream().collect(Collectors.toList());
-		if(!CollectionUtils.isEmpty(repos)) {
-			for (UpdateRepository newRepo : repos) {
-				if (newRepo != null) {
-					repositories.add(newRepo);
-				}
-			}
-		}
-		
-		UpdateManager updateManager = null;
-		if (StringUtils.hasText(properties.getReposJsonPath())) {
-			updateManager = new UpdateManager(pluginManager, Paths.get(properties.getReposJsonPath()));
-			if(!CollectionUtils.isEmpty(repositories)) {
-				updateManager.setRepositories(repositories);
-			}
-		} else if(!CollectionUtils.isEmpty(repositories)) {
-			updateManager = new UpdateManager(pluginManager, repositories);
-		} else {
-			updateManager = new UpdateManager(pluginManager);
-		}
-		
-		// auto update
-		if(properties.isAutoUpdate()) {
-			timer.scheduleAtFixedRate(new PluginUpdateTask(pluginManager, updateManager), properties.getDelay(), properties.getPeriod());
-		}
-		return updateManager;
 	}
 
 }

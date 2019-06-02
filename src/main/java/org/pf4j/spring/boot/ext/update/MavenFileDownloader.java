@@ -20,17 +20,17 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.maven.spring.boot.ext.MavenClientTemplate;
 import org.pf4j.PluginException;
 import org.pf4j.update.FileDownloader;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.cloud.deployer.resource.maven.MavenProperties;
+import org.springframework.cloud.deployer.resource.maven.MavenResource;
 
 public class MavenFileDownloader implements FileDownloader {
 
-	private MavenClientTemplate mavenClientTemplate;
+	private MavenProperties mavenProperties;
 	
-	public MavenFileDownloader(MavenClientTemplate mavenClientTemplate) {
-		this.mavenClientTemplate = mavenClientTemplate;
+	public MavenFileDownloader(MavenProperties mavenProperties) {
+		this.mavenProperties = mavenProperties;
 	}
 
 	/**
@@ -62,11 +62,11 @@ public class MavenFileDownloader implements FileDownloader {
     protected Path downloadFileHttp(URL fileUrl) throws IOException, PluginException {
         Path destination = Files.createTempDirectory("pf4j-update-downloader");
         destination.toFile().deleteOnExit();
-
+        
         String path = fileUrl.getPath();
-        String fileName = path.substring(path.lastIndexOf('/') + 1);
-        FileSystemResource resource = (FileSystemResource) mavenClientTemplate.resource(fileName);
-        return resource.getFile().toPath();
+        String coordinates = path.substring(path.lastIndexOf('/') + 1);
+        
+        return MavenResource.parse(coordinates, mavenProperties).getFile().toPath();
     }
  
     
