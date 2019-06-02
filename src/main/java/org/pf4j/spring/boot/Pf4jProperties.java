@@ -33,6 +33,12 @@ public class Pf4jProperties {
 	private boolean enabled = false;
 	/** Whether to automatically inject dependent objects */
 	private boolean autowire = true;
+	/**
+	 * Set to true to allow requires expression to be exactly x.y.z. The default is
+	 * false, meaning that using an exact version x.y.z will implicitly mean the
+	 * same as >=x.y.z
+	 */
+	private boolean exactVersionAllowed = false;
 	/** Whether to register the object to the spring context */
 	private boolean injectable = true;
 	/** Whether always returns a singleton instance. */
@@ -42,7 +48,7 @@ public class Pf4jProperties {
 	/** Extended Plugin Jar Directory **/
 	private List<String> libDirectories = new ArrayList<String>();
 	/** Runtime Mode：development、 deployment **/
-	private String mode = RuntimeMode.DEPLOYMENT.toString();
+	private RuntimeMode runtimeMode = RuntimeMode.DEPLOYMENT;
 	/**
 	 * Plugin root directory: default “plugins”; when non-jar mode plugin, the value
 	 * should be an absolute directory address
@@ -52,12 +58,15 @@ public class Pf4jProperties {
 	private List<String> plugins = new ArrayList<String>();
 	/** Whether the plugin is a JAR package **/
 	private boolean jarPackages = true;
-
+	/* The system version used for comparisons to the plugin requires attribute. */
+	private String systemVersion = "0.0.0";
 	/** Whether to automatically update the plugin **/
 	private boolean autoUpdate = false;
-	/** The period of plugin automatic update check, default：5000 milliseconds **/
-	private long period = 5000;
-	/** Local Repos Path , i.e : repositories.json**/
+	/** The delay of plugin automatic update check, default：10000 milliseconds **/
+	private long delay = 10000;
+	/** The period of plugin automatic update check, default：10 seconds **/
+	private long period = 1000 * 60 * 10;
+	/** Local Repos Path , i.e : repositories.json **/
 	protected String reposJsonPath;
 	/** Remote Repos Path **/
 	protected List<Pf4jUpdateProperties> repos = new ArrayList<Pf4jUpdateProperties>();
@@ -69,7 +78,7 @@ public class Pf4jProperties {
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-	
+
 	public boolean isAutowire() {
 		return autowire;
 	}
@@ -110,12 +119,20 @@ public class Pf4jProperties {
 		this.libDirectories = libDirectories;
 	}
 
-	public String getMode() {
-		return mode;
+	public RuntimeMode getRuntimeMode() {
+		return runtimeMode;
 	}
 
-	public void setMode(String mode) {
-		this.mode = mode;
+	public void setRuntimeMode(RuntimeMode runtimeMode) {
+		this.runtimeMode = runtimeMode;
+	}
+
+	public String getSystemVersion() {
+		return systemVersion;
+	}
+
+	public void setSystemVersion(String systemVersion) {
+		this.systemVersion = systemVersion;
 	}
 
 	public String getPluginsRoot() {
@@ -142,12 +159,35 @@ public class Pf4jProperties {
 		this.jarPackages = jarPackages;
 	}
 
+	/**
+	 * Set to true to allow requires expression to be exactly x.y.z. The default is
+	 * false, meaning that using an exact version x.y.z will implicitly mean the
+	 * same as >=x.y.z
+	 *
+	 * @param exactVersionAllowed set to true or false
+	 */
+	public void setExactVersionAllowed(boolean exactVersionAllowed) {
+		this.exactVersionAllowed = exactVersionAllowed;
+	}
+
+	public boolean isExactVersionAllowed() {
+		return exactVersionAllowed;
+	}
+
 	public boolean isAutoUpdate() {
 		return autoUpdate;
 	}
 
 	public void setAutoUpdate(boolean autoUpdate) {
 		this.autoUpdate = autoUpdate;
+	}
+
+	public long getDelay() {
+		return delay;
+	}
+
+	public void setDelay(long delay) {
+		this.delay = delay;
 	}
 
 	public long getPeriod() {
@@ -173,5 +213,5 @@ public class Pf4jProperties {
 	public void setRepos(List<Pf4jUpdateProperties> repos) {
 		this.repos = repos;
 	}
-	
+
 }

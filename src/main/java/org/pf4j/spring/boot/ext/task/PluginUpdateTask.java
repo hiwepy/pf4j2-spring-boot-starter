@@ -52,6 +52,9 @@ public class PluginUpdateTask extends TimerTask {
 	        	
 	        	logger.debug("Found update for plugin '{}'", plugin.id);
 	            PluginInfo.PluginRelease lastRelease = plugin.getLastRelease(pluginManager.getSystemVersion(), pluginManager.getVersionManager());
+	            if(lastRelease == null) {
+	            	continue;
+	            }
 	            String lastVersion = lastRelease.version;
 	            String installedVersion = pluginManager.getPlugin(plugin.id).getDescriptor().getVersion();
 	            logger.debug("Update plugin '{}' from version {} to version {}", plugin.id, installedVersion, lastVersion);
@@ -80,6 +83,9 @@ public class PluginUpdateTask extends TimerTask {
 	        for (PluginInfo plugin : availablePlugins) {
 	        	logger.debug("Found available plugin '{}'", plugin.id);
 	        	PluginInfo.PluginRelease lastRelease = plugin.getLastRelease(pluginManager.getSystemVersion(), pluginManager.getVersionManager());
+	        	if(lastRelease == null) {
+	            	continue;
+	            }
 	            String lastVersion = lastRelease.version;
 	            logger.debug("Install plugin '{}' with version {}", plugin.id, lastVersion);
 	            try {

@@ -1,2 +1,3 @@
 spring:
-  pf4j:    jar-packages: true
+  pf4j:
+    jar-packages: true

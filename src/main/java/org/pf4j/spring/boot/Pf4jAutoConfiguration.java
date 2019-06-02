@@ -97,14 +97,13 @@ public class Pf4jAutoConfiguration {
 	public PluginManager pluginManager(Pf4jProperties properties) {
 
 		// 设置运行模式
-		RuntimeMode mode = RuntimeMode.byName(properties.getMode());
-		System.setProperty("pf4j.mode", mode.toString());
+		System.setProperty("pf4j.mode", properties.getRuntimeMode().toString());
 		
 		// 设置插件目录
 		String pluginsRoot = StringUtils.hasText(properties.getPluginsRoot()) ? properties.getPluginsRoot() : "plugins";
 		System.setProperty("pf4j.pluginsDir", pluginsRoot);
 		String apphome = System.getProperty("app.home");
-		if (RuntimeMode.DEPLOYMENT.compareTo(RuntimeMode.byName(properties.getMode())) == 0
+		if (RuntimeMode.DEPLOYMENT.compareTo(properties.getRuntimeMode()) == 0
 				&& StringUtils.hasText(apphome)) {
 			System.setProperty("pf4j.pluginsDir", apphome + File.separator + pluginsRoot);
 		}
@@ -115,17 +114,27 @@ public class Pf4jAutoConfiguration {
 		ExtendedSpringPluginManager pluginManager = new ExtendedSpringPluginManager(pluginsRoot,
 				properties.isAutowire(), properties.isSingleton(), properties.isInjectable());
 		
+		pluginManager.setExactVersionAllowed(properties.isExactVersionAllowed());
+		pluginManager.setSystemVersion(properties.getSystemVersion());
+		
 		/*
-		 * pluginManager.enablePlugin(pluginId) pluginManager.disablePlugin(pluginId)
+		 * pluginManager.enablePlugin(pluginId) 
+		 * pluginManager.disablePlugin(pluginId)
 		 * pluginManager.deletePlugin(pluginId)
-		 * 
-		 * pluginManager.loadPlugin(pluginPath) pluginManager.startPlugin(pluginId)
-		 * pluginManager.stopPlugin(pluginId) pluginManager.unloadPlugin(pluginId)
+		 * pluginManager.loadPlugin(pluginPath) 
+		 * pluginManager.startPlugin(pluginId)
+		 * pluginManager.stopPlugin(pluginId) 
+		 * pluginManager.unloadPlugin(pluginId)
 		 */
+		
+		// 加载、启动插件目录中的插件
+		pluginManager.loadPlugins();
+		// 调用Plugin实现类的start()方法
+		pluginManager.startPlugins();
 
 		// 加载、启动绝对路径指定的插件
 		PluginUtils.loadAndStartPlugins(pluginManager, properties.getPlugins());
-
+		
 		/**
 		 * 应用退出时，要调用shutdown来清理资源，关闭网络连接 注意：我们建议应用在JBOSS、Tomcat等容器的退出钩子里调用shutdown方法
 		 */
@@ -169,7 +178,7 @@ public class Pf4jAutoConfiguration {
 		
 		// auto update
 		if(properties.isAutoUpdate()) {
-			timer.schedule(new PluginUpdateTask(pluginManager, updateManager), properties.getPeriod());
+			timer.scheduleAtFixedRate(new PluginUpdateTask(pluginManager, updateManager), properties.getDelay(), properties.getPeriod());
 		}
 		return updateManager;
 	}
