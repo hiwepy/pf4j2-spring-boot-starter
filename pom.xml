@@ -495,7 +495,6 @@
 		<dependency>
 		    <groupId>org.springframework.cloud</groupId>
 		    <artifactId>spring-cloud-deployer-resource-maven</artifactId>
-		    <optional>true</optional>
 		</dependency>
 				
 	</dependencies>
