@@ -28,12 +28,6 @@ public class Pf4jUpdateProperties {
 
 	/** Enable Pf4j Update. */
 	private boolean enabled = false;
-	/** Whether to automatically update the plugin **/
-	private boolean autoUpdate = false;
-	/** The delay of plugin automatic update check, default：10000 milliseconds **/
-	private long delay = 10000;
-	/** The period of plugin automatic update check, default：10 seconds **/
-	private long period = 1000 * 60 * 10;
 	/** Local Repos Path , i.e : repositories.json **/
 	private String reposJsonPath;
 	/** Remote Repos Path **/
@@ -45,30 +39,6 @@ public class Pf4jUpdateProperties {
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
-	}
-
-	public boolean isAutoUpdate() {
-		return autoUpdate;
-	}
-
-	public void setAutoUpdate(boolean autoUpdate) {
-		this.autoUpdate = autoUpdate;
-	}
-
-	public long getDelay() {
-		return delay;
-	}
-
-	public void setDelay(long delay) {
-		this.delay = delay;
-	}
-
-	public long getPeriod() {
-		return period;
-	}
-
-	public void setPeriod(long period) {
-		this.period = period;
 	}
 
 	public String getReposJsonPath() {

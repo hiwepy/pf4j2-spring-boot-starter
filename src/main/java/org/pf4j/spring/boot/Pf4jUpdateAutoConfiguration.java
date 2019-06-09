@@ -18,13 +18,11 @@ package org.pf4j.spring.boot;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 import java.util.stream.Collectors;
 
 import org.pf4j.PluginManager;
 import org.pf4j.spring.boot.ext.property.Pf4jPluginRepoProperties;
 import org.pf4j.spring.boot.ext.property.Pf4jUpdateMavenProperties;
-import org.pf4j.spring.boot.ext.task.PluginUpdateTask;
 import org.pf4j.spring.boot.ext.update.DefaultPluginInfoProvider;
 import org.pf4j.spring.boot.ext.update.PluginInfoProvider;
 import org.pf4j.update.DefaultUpdateRepository;
@@ -51,9 +49,6 @@ import org.springframework.util.StringUtils;
 @ConditionalOnProperty(prefix = Pf4jUpdateProperties.PREFIX, value = "enabled", havingValue = "true")
 @EnableConfigurationProperties({Pf4jUpdateProperties.class, Pf4jUpdateMavenProperties.class})
 public class Pf4jUpdateAutoConfiguration {
-	
-	// 实例化Timer类
-	private Timer timer = new Timer(true);
 	
 	@Bean
 	@ConditionalOnMissingBean
@@ -94,10 +89,6 @@ public class Pf4jUpdateAutoConfiguration {
 			updateManager = new UpdateManager(pluginManager);
 		}
 		
-		// auto update
-		if(properties.isAutoUpdate()) {
-			timer.scheduleAtFixedRate(new PluginUpdateTask(pluginManager, updateManager), properties.getDelay(), properties.getPeriod());
-		}
 		return updateManager;
 	}
 	
