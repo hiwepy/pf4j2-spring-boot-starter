@@ -28,8 +28,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import com.github.zafarkhaja.semver.Version;
-
 @EnableScheduling
 @SpringBootApplication
 public class Pf4jUpdateAutoConfiguration_Test {
@@ -56,9 +54,12 @@ public class Pf4jUpdateAutoConfiguration_Test {
 	        for (PluginInfo plugin : updates) {
 	        	
 	        	logger.debug("Found update for plugin '{}'", plugin.id);
-	            PluginInfo.PluginRelease lastRelease = plugin.getLastRelease(pluginManager.getSystemVersion());
+	            PluginInfo.PluginRelease lastRelease = plugin.getLastRelease(pluginManager.getSystemVersion(), pluginManager.getVersionManager());
+	            if(lastRelease == null) {
+	            	continue;
+	            }
 	            String lastVersion = lastRelease.version;
-	            Version installedVersion = pluginManager.getPlugin(plugin.id).getDescriptor().getVersion();
+	            String installedVersion = pluginManager.getPlugin(plugin.id).getDescriptor().getVersion();
 	            logger.debug("Update plugin '{}' from version {} to version {}", plugin.id, installedVersion, lastVersion);
 				try {
 					boolean updated = updateManager.updatePlugin(plugin.id, lastVersion);
@@ -84,7 +85,10 @@ public class Pf4jUpdateAutoConfiguration_Test {
 	        logger.debug("Found {} available plugins", availablePlugins.size());
 	        for (PluginInfo plugin : availablePlugins) {
 	        	logger.debug("Found available plugin '{}'", plugin.id);
-	        	PluginInfo.PluginRelease lastRelease = plugin.getLastRelease(pluginManager.getSystemVersion());
+	        	PluginInfo.PluginRelease lastRelease = plugin.getLastRelease(pluginManager.getSystemVersion(), pluginManager.getVersionManager());
+	        	if(lastRelease == null) {
+	            	continue;
+	            }
 	            String lastVersion = lastRelease.version;
 	            logger.debug("Install plugin '{}' with version {}", plugin.id, lastVersion);
 	            try {
