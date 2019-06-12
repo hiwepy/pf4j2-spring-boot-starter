@@ -17,7 +17,6 @@ package org.pf4j.spring.boot.ext.update;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.pf4j.PluginException;
@@ -46,6 +45,7 @@ public class MavenFileDownloader implements FileDownloader {
 	        case "http":
 	        case "https":
 	        case "ftp":
+	        case "file":
                 return downloadFileHttp(fileUrl);
             default:
                 throw new PluginException("URL protocol {} not supported", fileUrl.getProtocol());
@@ -60,12 +60,12 @@ public class MavenFileDownloader implements FileDownloader {
      * @throws PluginException if validation fails or any other problems
      */
     protected Path downloadFileHttp(URL fileUrl) throws IOException, PluginException {
-        Path destination = Files.createTempDirectory("pf4j-update-downloader");
-        destination.toFile().deleteOnExit();
-        
-        String path = fileUrl.getPath();
-        String coordinates = path.substring(path.lastIndexOf('/') + 1);
-        
+    	
+    	// http://com.itextpdf/pdfdebug/2.0.1
+    	
+        String path = fileUrl.toString();
+        String coordinates = path.substring("file://".length()).replace("/", ":");
+    
         return MavenResource.parse(coordinates, mavenProperties).getFile().toPath();
     }
  

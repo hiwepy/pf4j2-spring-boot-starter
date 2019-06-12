@@ -113,10 +113,11 @@ public class Pf4jAutoConfiguration {
 		 * pluginManager.unloadPlugin(pluginId)
 		 */
 		
+		// @see org.pf4j.spring.boot.ext.ExtendedSpringPluginManager#init()
 		// 加载、启动插件目录中的插件
-		pluginManager.loadPlugins();
+		//pluginManager.loadPlugins();
 		// 调用Plugin实现类的start()方法
-		pluginManager.startPlugins();
+		//pluginManager.startPlugins();
 
 		// 加载、启动绝对路径指定的插件
 		PluginUtils.loadAndStartPlugins(pluginManager, properties.getPlugins());
