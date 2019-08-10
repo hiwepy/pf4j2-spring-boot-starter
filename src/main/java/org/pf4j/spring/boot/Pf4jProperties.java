@@ -36,7 +36,7 @@ public class Pf4jProperties {
 	/**
 	 * Set to true to allow requires expression to be exactly x.y.z. The default is
 	 * false, meaning that using an exact version x.y.z will implicitly mean the
-	 * same as >=x.y.z
+	 * same as  &gt;=x.y.z
 	 */
 	private boolean exactVersionAllowed = false;
 	/** Whether to register the object to the spring context */
@@ -153,7 +153,7 @@ public class Pf4jProperties {
 	/**
 	 * Set to true to allow requires expression to be exactly x.y.z. The default is
 	 * false, meaning that using an exact version x.y.z will implicitly mean the
-	 * same as >=x.y.z
+	 * same as  &gt;=x.y.z
 	 *
 	 * @param exactVersionAllowed set to true or false
 	 */
