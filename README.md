@@ -1,4 +1,4 @@
-# spring-boot-starter-pf4j2
+# pf4j2-spring-boot-starter
 pf4j starter for spring boot
 
 ### 说明
@@ -13,7 +13,7 @@ pf4j starter for spring boot
 ``` xml
 <dependency>
 	<groupId>${project.groupId}</groupId>
-	<artifactId>spring-boot-starter-pf4j2</artifactId>
+	<artifactId>pf4j2-spring-boot-starter</artifactId>
 	<version>${project.version}</version>
 </dependency>
 ```

@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.4.RELEASE</version>
+		<version>2.2.1.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	
 	<groupId>com.github.vindell</groupId>
-	<artifactId>spring-boot-starter-pf4j2</artifactId>
+	<artifactId>pf4j2-spring-boot-starter</artifactId>
 	<description>Spring Boot Starter For Pf4j 2.x</description>
 	<version>1.0.8-SNAPSHOT</version>
 	<name>${project.groupId}:${project.artifactId}</name>
