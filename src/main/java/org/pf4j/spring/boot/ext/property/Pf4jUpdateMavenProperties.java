@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, vindell (https://github.com/vindell).
+ * Copyright (c) 2018, hiwepy (https://github.com/hiwepy).
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -20,7 +20,7 @@ import org.springframework.cloud.deployer.resource.maven.MavenProperties;
 
 /**
  * Maven Settings
- * @author ： <a href="https://github.com/vindell">vindell</a>
+ * @author ： <a href="https://github.com/hiwepy">hiwepy</a>
  */
 @ConfigurationProperties(Pf4jUpdateMavenProperties.PREFIX)
 public class Pf4jUpdateMavenProperties extends MavenProperties {
