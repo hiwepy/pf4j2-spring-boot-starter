@@ -24,13 +24,13 @@ import org.pf4j.PluginStateListener;
 import org.pf4j.RuntimeMode;
 import org.pf4j.spring.SpringPluginManager;
 import org.pf4j.spring.boot.ext.ExtendedSpringPluginManager;
-import org.pf4j.spring.boot.ext.property.Pf4jUpdateMavenProperties;
 import org.pf4j.spring.boot.ext.registry.Pf4jDynamicControllerRegistry;
 import org.pf4j.spring.boot.ext.utils.PluginUtils;
 import org.pf4j.spring.boot.hooks.Pf4jShutdownHook;
 import org.pf4j.update.UpdateManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -44,9 +44,10 @@ import org.springframework.util.StringUtils;
  * @author <a href="https://github.com/hiwepy">hiwepy</a>
  */
 @Configuration
+@AutoConfigureAfter({ Pf4jUpdateAutoConfiguration.class })
 @ConditionalOnClass({ PluginManager.class, UpdateManager.class, SpringPluginManager.class })
 @ConditionalOnProperty(prefix = Pf4jProperties.PREFIX, value = "enabled", havingValue = "true")
-@EnableConfigurationProperties({Pf4jProperties.class, Pf4jUpdateMavenProperties.class})
+@EnableConfigurationProperties({Pf4jProperties.class})
 public class Pf4jAutoConfiguration {
 
 	private Logger logger = LoggerFactory.getLogger(Pf4jAutoConfiguration.class);

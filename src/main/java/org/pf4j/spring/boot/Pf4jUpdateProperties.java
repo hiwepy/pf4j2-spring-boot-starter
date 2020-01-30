@@ -24,7 +24,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = Pf4jUpdateProperties.PREFIX)
 public class Pf4jUpdateProperties {
 
-	public static final String PREFIX = "spring.pf4j.update";
+	public static final String PREFIX = "pf4j.update";
 
 	/** Enable Pf4j Update. */
 	private boolean enabled = false;

@@ -22,16 +22,13 @@ import java.util.stream.Collectors;
 
 import org.pf4j.PluginManager;
 import org.pf4j.spring.boot.ext.property.Pf4jPluginRepoProperties;
-import org.pf4j.spring.boot.ext.property.Pf4jUpdateMavenProperties;
-import org.pf4j.spring.boot.ext.update.DefaultPluginInfoProvider;
-import org.pf4j.spring.boot.ext.update.PluginInfoProvider;
 import org.pf4j.update.DefaultUpdateRepository;
 import org.pf4j.update.UpdateManager;
 import org.pf4j.update.UpdateRepository;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -45,16 +42,11 @@ import org.springframework.util.StringUtils;
  * @author 		： <a href="https://github.com/hiwepy">hiwepy</a>
  */
 @Configuration
+@AutoConfigureAfter({ Pf4jMavenAutoConfiguration.class })
 @ConditionalOnClass({ UpdateManager.class })
 @ConditionalOnProperty(prefix = Pf4jUpdateProperties.PREFIX, value = "enabled", havingValue = "true")
-@EnableConfigurationProperties({Pf4jUpdateProperties.class, Pf4jUpdateMavenProperties.class})
+@EnableConfigurationProperties({Pf4jUpdateProperties.class})
 public class Pf4jUpdateAutoConfiguration {
-	
-	@Bean
-	@ConditionalOnMissingBean
-	public PluginInfoProvider pluginInfoProvider() {
-		return new DefaultPluginInfoProvider();
-	}
 	
 	@Bean
 	public UpdateManager updateManager(

@@ -1,3 +1,38 @@
-spring:
-  pf4j:
-    jar-packages: true
+################################################################################################################  
+###pf4j (本地需要配置Maven环境) 基本配置：  
+################################################################################################################
+pf4j:
+  jar-packages: true
+  maven:
+    enabled: false
+    # 当Maven验证构件校验文件失败时该怎么做-ignore（忽略），fail（失败），或者warn（警告）。
+    checksum-policy: warn
+    # 连接超时时间
+    connect-timeout: 1000000
+    # 本地Maven仓库
+    local-repository: E:\Java\.m2\repository
+    # 是否离线模式
+    offline: false
+    proxy:
+      auth:
+        username: proxyuser
+        password: proxypass
+      host: proxy.host.net
+      non-proxy-hosts: local.net,some.host.com
+      port: 80
+      protocol: http
+    # 远程仓库地址
+    remote-repositories:
+      '[maven-releases]' : 
+          url ： http://127.0.0.1:8081/repository/maven-releases/
+      '[maven-snapshots]' :  
+          url ：http://127.0.0.1:8081/repository/maven-snapshots/
+      '[thirdparty]' :  
+          url ：http://127.0.0.1:8081/nexus/content/repositories/thirdparty/
+    # 请求超时时间
+    request-timeout: 50000
+    # 除了解析JAR工件之外，如果为true，则解析POM工件。 这与Maven解析工件的方式一致。
+    resolve-pom: true
+    # 该参数指定更新发生的频率。Maven会比较本地POM和远程POM的时间戳。这里的选项是：always（一直），daily（默认，每日），interval：X（这里X是以分钟为单位的时间间隔），或者never（从不）。
+    update-policy: always
+    

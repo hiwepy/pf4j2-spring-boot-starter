@@ -27,7 +27,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = Pf4jProperties.PREFIX)
 public class Pf4jProperties {
 
-	public static final String PREFIX = "spring.pf4j";
+	public static final String PREFIX = "pf4j";
 
 	/** Enable Pf4j. */
 	private boolean enabled = false;
